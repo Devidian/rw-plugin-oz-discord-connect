@@ -1,0 +1,9 @@
+name: "OZ - Discord Plugin"
+main: de.omegazirkel.risingworld.DiscordWebHook
+version: 0.16.6
+author: "Maik 'Devidian' Laschober"
+team: "Omega Zirkel"
+description: "This Plugin can be used to display ingame chat in a Discord channel"
+license: N/A
+website: N/A
+loadorder: -10
