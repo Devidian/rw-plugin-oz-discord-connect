@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- refactor: dont ship `settings.properties`, renamed to `settings.default.properties` (0.16.7)
+  - prevent override on plugin update
+
 ## [0.16.6] - 2025-11-26
 
 - feat: new shortcut "+s " for screenshot to discord

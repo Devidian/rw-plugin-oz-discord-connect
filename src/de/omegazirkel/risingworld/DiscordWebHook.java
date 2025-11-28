@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -994,7 +996,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					e.printStackTrace();
 				}
 			} else {
-				logger().error("Channel of supportChannelId not found: " + supportChannelId);
+				logger().error("❌ Channel of supportChannelId not found: " + supportChannelId);
 			}
 		} else {
 			logger().error("❌ Unable to send support message: " + text);
@@ -1051,12 +1053,23 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	}
 
 	private void initSettings(String filePath) {
-		Properties settings = new Properties();
-		FileInputStream in;
+        Path settingsFile = Paths.get(filePath);
+        Path defaultSettingsFile = settingsFile.resolveSibling("settings.default.properties");
+
 		try {
-			in = new FileInputStream(filePath);
-			settings.load(new InputStreamReader(in, "UTF8"));
-			in.close();
+			if (Files.notExists(settingsFile) && Files.exists(defaultSettingsFile)) {
+                logger().info("settings.properties not found, copying from settings.default.properties...");
+                Files.copy(defaultSettingsFile, settingsFile);
+            }
+
+            Properties settings = new Properties();
+            if (Files.exists(settingsFile)) {
+                try (FileInputStream in = new FileInputStream(settingsFile.toFile())) {
+                    settings.load(new InputStreamReader(in, "UTF8"));
+                }
+            } else {
+                logger().warn("⚠️ Neither settings.properties nor settings.default.properties found. Using default values.");
+            }
 			// fill global values
 			// logLevel = Integer.parseInt(settings.getProperty("logLevel", "0"));
 			postChat = settings.getProperty("postChat", "false").contentEquals("true");
@@ -1178,9 +1191,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			ex.printStackTrace();
 		} catch (NumberFormatException ex) {
 			logger().error("NumberFormatException on initSettings: " + ex.getMessage());
-			ex.printStackTrace();
-		} catch (Exception ex) {
-			logger().error("Exception on initSettings: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
