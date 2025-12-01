@@ -133,7 +133,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static boolean trackMountKill = false;
 	static boolean trackNonHostileAnimalKill = false;
 	static boolean trackPickupables = false;
-	static Short trackServerLogLevel = 0;
+	static boolean trackPlayerDeaths = false;
+	static boolean trackPlayerTeleports = false;
+	static boolean trackWeatherChanges = false;
+	static boolean trackSeasonChanges = false;
 	static URI webHookEventUrl = null;
 	static long eventChannelId = 0;
 
@@ -143,7 +146,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static boolean allowRestart = false;
 
 	// other settings
-	// static boolean restartOnUpdate = true; // DEPRECATED will use
 	// reloadallplugins
 	static int restartMinimumTime = 86400;// (60 * 60 * 24); // 1 Day default
 	static boolean restartTimed = false; // restart schedule
@@ -549,7 +551,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		String message = t.get("EVENT_SEASON_CHANGE", botLang)
 				.replace("PH_SEASON", event.getSeason().toString());
 		eventLogger().info(message);
-		if (postTrackedEvents)
+		if (postTrackedEvents && trackSeasonChanges)
 			sendDiscordEventMessage(message);
 	}
 
@@ -565,7 +567,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				.replace("PH_WEATHER_TO", nextWeatherName);
 
 		eventLogger().info(message);
-		if (postTrackedEvents)
+		if (postTrackedEvents && trackWeatherChanges)
 			sendDiscordEventMessage(message);
 	}
 
@@ -578,7 +580,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""));
 
 		eventLogger().info(message);
-		if (postTrackedEvents)
+		if (postTrackedEvents && trackPlayerTeleports)
 			sendDiscordEventMessage(message);
 	}
 
@@ -591,7 +593,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				.replace("PH_LOCATION", event.getDeathPosition().toString().replaceAll("[,()]", ""));
 
 		eventLogger().info(message);
-		if (postTrackedEvents)
+		if (postTrackedEvents && trackPlayerDeaths)
 			sendDiscordEventMessage(message);
 	}
 
@@ -1053,23 +1055,24 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	}
 
 	private void initSettings(String filePath) {
-        Path settingsFile = Paths.get(filePath);
-        Path defaultSettingsFile = settingsFile.resolveSibling("settings.default.properties");
+		Path settingsFile = Paths.get(filePath);
+		Path defaultSettingsFile = settingsFile.resolveSibling("settings.default.properties");
 
 		try {
 			if (Files.notExists(settingsFile) && Files.exists(defaultSettingsFile)) {
-                logger().info("settings.properties not found, copying from settings.default.properties...");
-                Files.copy(defaultSettingsFile, settingsFile);
-            }
+				logger().info("settings.properties not found, copying from settings.default.properties...");
+				Files.copy(defaultSettingsFile, settingsFile);
+			}
 
-            Properties settings = new Properties();
-            if (Files.exists(settingsFile)) {
-                try (FileInputStream in = new FileInputStream(settingsFile.toFile())) {
-                    settings.load(new InputStreamReader(in, "UTF8"));
-                }
-            } else {
-                logger().warn("⚠️ Neither settings.properties nor settings.default.properties found. Using default values.");
-            }
+			Properties settings = new Properties();
+			if (Files.exists(settingsFile)) {
+				try (FileInputStream in = new FileInputStream(settingsFile.toFile())) {
+					settings.load(new InputStreamReader(in, "UTF8"));
+				}
+			} else {
+				logger().warn(
+						"⚠️ Neither settings.properties nor settings.default.properties found. Using default values.");
+			}
 			// fill global values
 			// logLevel = Integer.parseInt(settings.getProperty("logLevel", "0"));
 			postChat = settings.getProperty("postChat", "false").contentEquals("true");
@@ -1126,11 +1129,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			discordCommands.put("reloadplugins", Short.parseShort(settings.getProperty("botCMDreloadplugins", "2")));
 			// badass stuff
 			postTrackedEvents = settings.getProperty("postTrackedEvents", "false").contentEquals("true");
-			trackServerLogLevel = Short.parseShort(settings.getProperty("trackServerLogLevel", "100"));
 			trackMountKill = settings.getProperty("trackMountKill", "false").contentEquals("true");
 			trackNonHostileAnimalKill = settings.getProperty("trackNonHostileAnimalKill", "false")
 					.contentEquals("true");
 			trackPickupables = settings.getProperty("trackPickupables", "false").contentEquals("true");
+			trackPlayerDeaths = settings.getProperty("trackPlayerDeaths", "false").contentEquals("true");
+			trackPlayerTeleports = settings.getProperty("trackPlayerTeleports", "false").contentEquals("true");
+			trackWeatherChanges = settings.getProperty("trackWeatherChanges", "false").contentEquals("true");
+			trackSeasonChanges = settings.getProperty("trackSeasonChanges", "false").contentEquals("true");
 
 			// colors
 
@@ -1153,7 +1159,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			restartTimed = settings.getProperty("restartTimed", "false").contentEquals("true");
 			allowRestart = settings.getProperty("allowRestart", "false").contentEquals("true");
 			restartAdminOnly = settings.getProperty("restartAdminOnly", "false").contentEquals("true");
-			// restartOnUpdate = settings.getProperty("restartOnUpdate",
 			// "false").contentEquals("true");
 			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "86400"));
 			forceRestartAfter = Integer.parseInt(settings.getProperty("forceRestartAfter", "0"));

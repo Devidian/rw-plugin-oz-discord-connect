@@ -205,7 +205,7 @@
                 <executions>
 					<execution>
 						<id>copy-plugin</id>
-						<phase>prepare-package</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>

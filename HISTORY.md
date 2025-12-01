@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+- feat: new properties for discord tracking configuration
+  - `trackPlayerDeaths`
+  - `trackWeatherChanges`
+  - `trackSeasonChanges`
+  - `trackPlayerTeleports`
+- refactor: removed deprecated settings `restartOnUpdate`
+- refactor: reorganized settings file, important settings are now on top
 - refactor: dont ship `settings.properties`, renamed to `settings.default.properties` (0.16.7)
   - prevent override on plugin update
 
