@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -1196,6 +1197,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			ex.printStackTrace();
 		} catch (NumberFormatException ex) {
 			logger().error("NumberFormatException on initSettings: " + ex.getMessage());
+			ex.printStackTrace();
+		} catch (URISyntaxException ex) {
+			logger().error("URISyntaxException on initSettings: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}

@@ -11,6 +11,8 @@
 - refactor: reorganized settings file, important settings are now on top
 - refactor: dont ship `settings.properties`, renamed to `settings.default.properties` (0.16.7)
   - prevent override on plugin update
+- ci: fix credentials missing (settings.xml)
+- ci: changed groupId to `com.github.devidian`
 
 ## [0.16.6] - 2025-11-26
 

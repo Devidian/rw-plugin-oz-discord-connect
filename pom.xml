@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>devidian</groupId>
+    <groupId>com.github.devidian</groupId>
     <artifactId>rw-plugin-oz-discord-connect</artifactId>
-    <version>0.16.6</version>
-    <packaging>jar</packaging>
+    <version>0.16.10</version>
+
     <name>OZDiscordConnect</name>
     <description>Rising World Discord-Connect Plugin by OmegaZirkel.de</description>
 
@@ -71,17 +74,17 @@
 
         <!-- OZ Plugins -->
         <dependency>
-            <groupId>devidian</groupId>
+            <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-global-intercom</artifactId>
-            <version>0.12.5</version>
+            <version>0.12.8</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>devidian</groupId>
+            <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.9.2</version>
+            <version>0.9.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -95,7 +98,7 @@
     </dependencies>
 
     <build>
-        <!-- <sourceDirectory>src</sourceDirectory> -->
+        <sourceDirectory>src</sourceDirectory>
         <directory>target</directory>
         <finalName>${project.name}</finalName>
 
@@ -175,12 +178,13 @@
                 </configuration>
             </plugin>
 
-            <!-- Dependency copying -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.6.0</version>
+
                 <executions>
+                    <!-- Dependency copying -->
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
@@ -195,6 +199,26 @@
                             <!-- <excludeTransitive>true</excludeTransitive> -->
                         </configuration>
                     </execution>
+                    <!-- Copy jar -->
+                    <execution>
+                        <id>copy-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <destFileName>${project.name}.jar</destFileName>
+                                    <outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -203,60 +227,42 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <executions>
-					<execution>
-						<id>copy-plugin</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/target</directory>
-									<includes>
-										<include>${project.build.finalName}.jar</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-markdown</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<includes>
-										<include>*.md</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-settings</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/src</directory>
-									<includes>
-										<include>*.properties</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>copy-markdown</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>*.md</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-settings</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/dist/${project.name}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src</directory>
+                                    <includes>
+                                        <include>*.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy-resource-two</id>
                         <phase>prepare-package</phase>
@@ -295,7 +301,7 @@
 
                             <!-- Important: Inline descriptor -->
                             <descriptors>
-                                <descriptor>src/assembly/discord-connect.xml</descriptor>
+                                <descriptor>src/assembly/${project.artifactId}.xml</descriptor>
                             </descriptors>
 
                             <outputDirectory>${project.basedir}/dist</outputDirectory>
