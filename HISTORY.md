@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- feat: new properties for chat configuration
+  - `defaultChatPrefix` => ingame chat prefix for default channel 
+    - default: "[LOCAL] "
+  - `discordChatSyntax` => how discord displays chat if you use direct chat mode not webhooks
+    - default: "[chat] **PH_PLAYER**: **PH_MESSAGE**"
 - feat: new properties for discord tracking configuration
   - `trackPlayerDeaths`
   - `trackWeatherChanges`

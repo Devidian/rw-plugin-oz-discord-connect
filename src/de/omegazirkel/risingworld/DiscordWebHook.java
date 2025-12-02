@@ -162,6 +162,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static String colorLocalAdmin = "<color=#db3208>";
 	static String colorLocalOther = "<color=#dddddd>";
 	static String colorLocalDiscord = "<color=#ddddff>";
+	public static String defaultChatPrefix = "[LOCAL] ";
+	public static String discordChatSyntax = "[chat] **PH_PLAYER**: **PH_MESSAGE**";
 
 	public static Map<String, Short> discordCommands = new HashMap<>();
 
@@ -543,7 +545,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				group = " (" + eventPlayer.getPermissionGroup() + ")";
 			}
 
-			player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + group + ": " + c.text + noColorText);
+			player.sendTextMessage(
+					color + defaultChatPrefix + eventPlayer.getName() + group + ": " + c.text + noColorText);
 		}
 	}
 
@@ -911,7 +914,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			Optional<Channel> channel = JavaCordBot.api.getChannelById(chatChannelId);
 			if (!channel.isEmpty()) {
 				ServerTextChannel tc = channel.get().asServerTextChannel().get();
-				tc.sendMessage("[chat] " + username + ":> " + text).join();
+				tc.sendMessage(discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text))
+						.join();
 				logger().debug("Sent message to #" + tc.getName() + ": " + text);
 			} else {
 				logger().error("❌ Channel of chatChannelId not found: " + chatChannelId);
@@ -935,12 +939,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			if (!channel.isEmpty()) {
 				ServerTextChannel tc = channel.get().asServerTextChannel().get();
 				try {
-					tc.sendMessage("[chat] " + username + ":> " + text, Utils.byteArrayToFile(image, "screenshot.jpg"))
+					tc.sendMessage(discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text),
+							Utils.byteArrayToFile(image, "screenshot.jpg"))
 							.join();
 					logger().debug("Sent message to #" + tc.getName() + ": " + text);
 				} catch (Exception e) {
 					logger().error(e.toString());
-					tc.sendMessage("[chat] " + username + ":> " + text).join();
+					tc.sendMessage(discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text))
+							.join();
 					e.printStackTrace();
 				}
 			} else {
@@ -988,13 +994,15 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			if (!channel.isEmpty()) {
 				ServerTextChannel tc = channel.get().asServerTextChannel().get();
 				try {
-					tc.sendMessage("[chat] " + username + ":> " + text, Utils.byteArrayToFile(image, "screenshot.jpg"))
+					tc.sendMessage(discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text),
+							Utils.byteArrayToFile(image, "screenshot.jpg"))
 							.join();
 					logger().debug("Sent message to #" + tc.getName() + ": " + text);
 
 				} catch (Exception e) {
 					logger().error(e.toString());
-					tc.sendMessage("[chat] " + username + ":> " + text).join();
+					tc.sendMessage(discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text))
+							.join();
 					logger().debug("Sent message to #" + tc.getName() + ": " + text);
 					e.printStackTrace();
 				}
@@ -1148,6 +1156,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			colorLocalAdmin = settings.getProperty("colorLocalAdmin", "<color=#db3208>");
 			colorLocalOther = settings.getProperty("colorLocalOther", "<color=#dddddd>");
 			colorLocalDiscord = settings.getProperty("colorLocalDiscord", "<color=#ddddff>");
+			defaultChatPrefix = settings.getProperty("defaultChatPrefix", "[LOCAL] ");
+			discordChatSyntax = settings.getProperty("discordChatSyntax", "[chat] **PH_PLAYER**: **PH_MESSAGE**");
 
 			// screenshots
 			allowScreenshots = settings.getProperty("allowScreenshots", "true").contentEquals("true");
@@ -1383,7 +1393,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public static void restart() {
 		Server.saveAll();
 		instance.executeDelayed(5, () -> {
-			Server.sendInputCommand("shutdown");
+			Server.sendInputCommand("restart");
 		});
 	}
 }

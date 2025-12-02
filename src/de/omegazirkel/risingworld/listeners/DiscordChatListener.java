@@ -43,7 +43,7 @@ public class DiscordChatListener implements MessageCreateListener {
                 group = " (discord/admin)";
             }
             String displayName = author.getDisplayName();
-            Server.broadcastTextMessage(color + "[LOCAL] " + displayName + group + ": "
+            Server.broadcastTextMessage(color + (DiscordWebHook.defaultChatPrefix) + displayName + group + ": "
                     + pluginInstance.getColorEndTag() + content);
         }
 
