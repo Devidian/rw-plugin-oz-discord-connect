@@ -1275,7 +1275,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 						logger().info("Restarting server now (scheduled)");
 						if (DiscordWebHook.instance != null)
 							DiscordWebHook.instance.statusNotification("STATUS_RESTART_SCHEDULED");
-						JavaCordBot.api.updateActivity("Restarting soon...").join();
 						restart();
 					}
 				}
@@ -1293,7 +1292,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					@Override
 					public void run() {
 						logger().warn("Force server restart now!");
-						JavaCordBot.api.updateActivity("Restarting soon...").join();
 						for (Player player : Server.getAllPlayers()) {
 							player.kick("Server restart");
 						}
@@ -1370,11 +1368,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
 	public static void forceRestart() {
 		Server.saveAll();
-
 		if (instance == null) {
 			logger().error("DiscordWebHook instance is null, cannot execute forceRestart()");
 			return;
 		}
+		JavaCordBot.api.updateActivity("Restarting soon...");
 
 		instance.sendDiscordStatusMessage("STATUS_RESTART_FOCED");
 		instance.executeDelayed(5, () -> {
@@ -1390,6 +1388,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			return;
 		}
 
+		JavaCordBot.api.updateActivity("Restarting soon...");
 		instance.executeDelayed(5, () -> {
 			Server.sendInputCommand("restart");
 		});
