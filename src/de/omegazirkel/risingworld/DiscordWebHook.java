@@ -119,13 +119,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	// Discord status settings
 	static boolean postStatus = false;
 	static boolean useServerName = false;
-	static boolean reportStatusEnabled = false;
-	static boolean reportStatusDisabled = false;
+	static boolean reportServerStatus = false;
 	static boolean reportSettingsChanged = true;
 	static boolean reportJarChanged = true;
 	static String statusUsername = "My Server";
-	static String statusEnabledMessage = "My Server is now online";
-	static String statusDisabledMessage = "My Server is shutting down";
 	static URI webHookStatusUrl = null;
 	static long statusChannelId = 0;
 
@@ -300,9 +297,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 		DiscordWebHook.instance = this;
 
-		if (reportStatusEnabled) {
-			this.sendDiscordStatusMessage(statusEnabledMessage);
-		}
+		this.statusNotification("STATUS_ENABLED");
 	}
 
 	/**
@@ -310,12 +305,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 */
 	@Override
 	public void onDisable() {
-		if (reportStatusDisabled) {
-			// Sende Statusnachricht nur, wenn der Bot aktiviert und verbunden ist
-			if (botEnable && JavaCordBot.api != null && JavaCordBot.api.getStatus() == UserStatus.ONLINE) {
-				this.sendDiscordStatusMessage(statusDisabledMessage);
-			}
-		}
+		this.statusNotification("STATUS_DISABLED");
 		if (botEnable) {
 			JavaCordBot.disconnect();
 			DiscordBot = null;
@@ -1089,13 +1079,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
 
 			postStatus = settings.getProperty("postStatus", "false").contentEquals("true");
-			reportStatusEnabled = settings.getProperty("reportStatusEnabled", "true").contentEquals("true");
-			reportStatusDisabled = settings.getProperty("reportStatusDisabled", "true").contentEquals("true");
+			reportServerStatus = settings.getProperty("reportServerStatus", "true").contentEquals("true");
 			reportSettingsChanged = settings.getProperty("reportSettingsChanged", "true").contentEquals("true");
 			reportJarChanged = settings.getProperty("reportJarChanged", "true").contentEquals("true");
 			statusUsername = settings.getProperty("statusUsername", "");
-			statusEnabledMessage = settings.getProperty("statusEnabledMessage", "");
-			statusDisabledMessage = settings.getProperty("statusDisabledMessage", "");
 			useServerName = settings.getProperty("useServerName", "false").contentEquals("true");
 
 			postSupport = settings.getProperty("postSupport", "false").contentEquals("true");
@@ -1279,15 +1266,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 						logger().info("Setting restart flag for scheduled server-restart");
 						broadcastMessage("RS_SCHEDULE_INFO");
 						flagRestart = true;
+						if (DiscordWebHook.instance != null)
+							DiscordWebHook.instance.statusNotification("STATUS_RESTART_FLAG");
 						if (forceRestartAfter > 0) {
 							broadcastMessage("RS_SCHEDULE_WARN", forceRestartAfter);
 						}
 					} else {
 						logger().info("Restarting server now (scheduled)");
 						if (DiscordWebHook.instance != null)
-							DiscordWebHook.instance.sendDiscordStatusMessage("Scheduled restart now!");
-						JavaCordBot.api.updateActivity("Restarting...");
-						JavaCordBot.disconnect();
+							DiscordWebHook.instance.statusNotification("STATUS_RESTART_SCHEDULED");
+						JavaCordBot.api.updateActivity("Restarting soon...").join();
 						restart();
 					}
 				}
@@ -1305,14 +1293,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					@Override
 					public void run() {
 						logger().warn("Force server restart now!");
-						JavaCordBot.api.updateActivity("Restarting...");
+						JavaCordBot.api.updateActivity("Restarting soon...").join();
 						for (Player player : Server.getAllPlayers()) {
 							player.kick("Server restart");
 						}
-						if (DiscordWebHook.instance != null)
-							DiscordWebHook.instance.sendDiscordStatusMessage("Forced restart (shutdown) now!");
-						JavaCordBot.disconnect();
-						shutdown();
+						forceRestart();
 					}
 				};
 
@@ -1383,8 +1368,15 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		this.initialize();
 	}
 
-	public static void shutdown() {
+	public static void forceRestart() {
 		Server.saveAll();
+
+		if (instance == null) {
+			logger().error("DiscordWebHook instance is null, cannot execute forceRestart()");
+			return;
+		}
+
+		instance.sendDiscordStatusMessage("STATUS_RESTART_FOCED");
 		instance.executeDelayed(5, () -> {
 			Server.sendInputCommand("restart");
 		});
@@ -1392,8 +1384,30 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
 	public static void restart() {
 		Server.saveAll();
+
+		if (instance == null) {
+			logger().error("DiscordWebHook instance is null, cannot execute restart()");
+			return;
+		}
+
 		instance.executeDelayed(5, () -> {
 			Server.sendInputCommand("restart");
 		});
+	}
+
+	public void statusNotification(String message) {
+		if (reportServerStatus) {
+			String messageText = t.get(message, botLang)
+					.replace("PH_PLUGIN_NAME", this.getDescription("name"))
+					.replace("PH_PLUGIN_VERSION", this.getDescription("version"))
+					.replace("PH_PLAYER_COUNT", Server.getPlayerCount() + "");
+			// Sende Statusnachricht nur, wenn der Bot aktiviert und verbunden ist
+			if (botEnable && JavaCordBot.api != null && JavaCordBot.api.getStatus() == UserStatus.ONLINE) {
+
+				this.sendDiscordStatusMessage(messageText);
+			} else {
+				logger().warn("Could not send: " + messageText);
+			}
+		}
 	}
 }

@@ -12,10 +12,18 @@
   - `trackWeatherChanges`
   - `trackSeasonChanges`
   - `trackPlayerTeleports`
+- refactor: removed `reportStatusDisabled`, renamed `reportStatusEnabled` to `reportServerStatus` (0.16.12)
+- refactor: removed `statusEnabledMessage` and `statusDisabledMessage` (0.16.12)
+  - messages added to translation files `STATUS_*`, with placeholder:
+    - `PH_PLUGIN_NAME`
+    - `PH_PLUGIN_VERSION`
+    - `PH_PLAYER_COUNT`
 - refactor: removed deprecated settings `restartOnUpdate`
 - refactor: reorganized settings file, important settings are now on top
 - refactor: dont ship `settings.properties`, renamed to `settings.default.properties` (0.16.7)
   - prevent override on plugin update
+- fix: removed `JavaCordBot.disconnect()` from restart timer (no message issue) (0.16.12)
+  - will now only be called in onDisable
 - ci: fix credentials missing (settings.xml)
 - ci: changed groupId to `com.github.devidian`
 
