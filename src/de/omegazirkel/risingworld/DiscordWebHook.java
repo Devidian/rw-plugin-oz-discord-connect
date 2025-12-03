@@ -438,9 +438,6 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			} else {
 				player.connectToDiscord("https://discord.gg/" + joinDiscord);
 			}
-		} else if (command.equals("/ozrestart")) {
-			player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("CMD_ERR_DEPRECATED", lang)
-					.replace("PH_NEWCMD", c.command + "/" + pluginCMD + " restart" + c.text));
 		}
 
 	}
@@ -1374,7 +1371,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		}
 		JavaCordBot.api.updateActivity("Restarting soon...");
 
-		instance.sendDiscordStatusMessage("STATUS_RESTART_FOCED");
+		instance.statusNotification("STATUS_RESTART_FORCED");
 		instance.executeDelayed(5, () -> {
 			Server.sendInputCommand("restart");
 		});
