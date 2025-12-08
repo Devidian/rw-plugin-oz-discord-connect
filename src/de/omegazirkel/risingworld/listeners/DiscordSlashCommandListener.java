@@ -51,7 +51,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
                         + interaction.getCommandId() + "> Available commands: " + commandNames.toString());
 
                 interaction.createImmediateResponder()
-                        .setContent(t.get("CMD_ERR_UNKNOWN", lang).replace("PH_CMD", commandName))
+                        .setContent(t.get("TC_CMD_ERR_UNKNOWN", lang).replace("PH_CMD", commandName))
                         .setFlags(MessageFlag.EPHEMERAL)
                         .respond().join();
                 return;
@@ -133,7 +133,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
                     JavaCordBot.logger().warn("User issued unknown slashCommand <name:" + commandName + "><id:"
                             + interaction.getCommandId() + ">");
                     interaction.createImmediateResponder()
-                            .setContent(t.get("CMD_ERR_UNKNOWN", lang).replace("PH_CMD", commandName))
+                            .setContent(t.get("TC_CMD_ERR_UNKNOWN", lang).replace("PH_CMD", commandName))
                             .setFlags(MessageFlag.EPHEMERAL)
                             .respond().join();
                     break;
@@ -153,7 +153,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         String commandName = interaction.getCommandName();
         if (!s.discordCommands.containsKey(commandName)) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_NOLEVEL", lang).replace("PH_CMD", commandName))
+                    .setContent(t.get("TC_CMD_ERR_NOLEVEL", lang).replace("PH_CMD", commandName))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return false;
@@ -167,13 +167,13 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (commandLevel == 0) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_DISABLED", lang).replace("PH_CMD", commandName))
+                    .setContent(t.get("TC_CMD_ERR_DISABLED", lang).replace("PH_CMD", commandName))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return false;
         } else if (commandLevel > 1 && !canExecuteSecureCommands) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ADMIN_ONLY", lang).replace("PH_CMD", commandName))
+                    .setContent(t.get("TC_CMD_ERR_ADMIN_ONLY", lang).replace("PH_CMD", commandName))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return false;
@@ -199,7 +199,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
             player = Server.getPlayerByName(playerName.get());
         } else {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_BAN_ARGUMENTS", lang))
+                    .setContent(t.get("TC_CMD_ERR_BAN_ARGUMENTS", lang))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -207,7 +207,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerID.toString()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerID.toString()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -219,7 +219,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         for (Player p : Server.getAllPlayers()) {
             String l = p.getSystemLanguage();
             p.sendTextMessage(c.warning + plugin.getName() + ":>" + c.text
-                    + t.get("BC_BANNED", l).replace("PH_PLAYER", player.getName())
+                    + t.get("TC_BC_BANNED", l).replace("PH_PLAYER", player.getName())
                             .replace("PH_DISCORDUSER",
                                     interaction.getUser().getDisplayName(interaction.getServer().get()))
                             .replace("PH_REASON", reason));
@@ -250,13 +250,13 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         int playersOnline = Server.getPlayerCount();
         if (playersOnline == 0) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_OUT_ONLINE_NOBODY", lang))
+                    .setContent(t.get("TC_CMD_OUT_ONLINE_NOBODY", lang))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
         }
 
-        List<String> list = Arrays.asList(t.get("CMD_OUT_ONLINE_LIST", lang) + "\n");
+        List<String> list = Arrays.asList(t.get("TC_CMD_OUT_ONLINE_LIST", lang) + "\n");
         StringBuilder sb = new StringBuilder();
         list.forEach(sb::append);
         for (Player p : Server.getAllPlayers()) {
@@ -276,7 +276,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         String lang = s.botLang;
         try {
             interaction.createImmediateResponder()
-                    .setContent(t.get("DISCORD_HELP_SHORT", lang))
+                    .setContent(t.get("TC_DISCORD_HELP_SHORT", lang))
                     // TODO send long help as file?
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -307,7 +307,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         WorldDatabase db = plugin.getWorldDatabase(Target.Bans);
         try (ResultSet result = db.executeQuery("SELECT * FROM `Banlist`")) {
-            List<String> list = Arrays.asList(t.get("CMD_OUT_BANNED_LIST", lang) + "\n");
+            List<String> list = Arrays.asList(t.get("TC_CMD_OUT_BANNED_LIST", lang) + "\n");
             StringBuilder sb = new StringBuilder();
             list.forEach(sb::append);
             // FIXME find a way to display results as table in discord
@@ -345,8 +345,8 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
     private void handleGetTimeCommand(SlashCommandInteraction interaction) {
         String lang = s.botLang;
-        String season = t.get("SEASON_" + Server.getCurrentSeason().toString().toUpperCase(), lang);
-        String response = t.get("CMD_OUT_TIME", lang)
+        String season = t.get("TC_SEASON_" + Server.getCurrentSeason().toString().toUpperCase(), lang);
+        String response = t.get("TC_CMD_OUT_TIME", lang)
                 .replace("PH_TIME", Server.getGameTime(Unit.Hours) + ":" + Server.getGameTime(Unit.Minutes))
                 .replace("PH_SEASON", season)
                 .replace("PH_YEAR", Server.getGameTime(Unit.Years) + "")
@@ -369,9 +369,9 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         String lang = s.botLang;
 
         WeatherDefs.Weather defCurrent = Server.getCurrentWeather();
-        String currentWeatherName = t.get("WEATHER_" + defCurrent.name.toUpperCase(), lang);
+        String currentWeatherName = t.get("TC_WEATHER_" + defCurrent.name.toUpperCase(), lang);
         interaction.createImmediateResponder()
-                .setContent(t.get("CMD_OUT_WEATHER", lang).replace("PH_WEATHER", currentWeatherName))
+                .setContent(t.get("TC_CMD_OUT_WEATHER", lang).replace("PH_WEATHER", currentWeatherName))
                 .setFlags(MessageFlag.EPHEMERAL)
                 .respond().join();
     }
@@ -386,7 +386,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (groupName == null || playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_GROUP_ARGUMENTS", lang))
+                    .setContent(t.get("TC_CMD_ERR_GROUP_ARGUMENTS", lang))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -395,7 +395,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         Player player = Server.getPlayerByName(playerName.get());
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -405,13 +405,13 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         for (Player p : Server.getAllPlayers()) {
             String l = p.getSystemLanguage();
             p.sendTextMessage(c.warning + plugin.getName() + ":>" + c.text
-                    + t.get("BC_GROUP", l)
+                    + t.get("TC_BC_GROUP", l)
                             .replace("PH_DISCORDUSER", user.getDisplayName(interaction.getServer().get()))
                             .replace("PH_PLAYER", playerName.get())
                             .replace("PH_GROUP", groupName.get()));
         }
         interaction.createImmediateResponder()
-                .setContent(t.get("CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName.get()).replace("PH_GROUP",
+                .setContent(t.get("TC_CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName.get()).replace("PH_GROUP",
                         groupName.get()))
                 .setFlags(MessageFlag.EPHEMERAL)
                 .respond().join();
@@ -427,7 +427,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_KICK_ARGUMENTS", lang))
+                    .setContent(t.get("TC_CMD_ERR_KICK_ARGUMENTS", lang))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -438,7 +438,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (player == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -449,7 +449,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
             String l = p.getSystemLanguage();
             p.sendTextMessage(c.warning + plugin.getName() + ":>" + c.text
-                    + t.get("BC_KICKED", l)
+                    + t.get("TC_BC_KICKED", l)
                             .replace("PH_PLAYER", playerName.get())
                             .replace("PH_DISCORDUSER", user.getDisplayName(interaction.getServer().get()))
                             .replace("PH_REASON", reason));
@@ -469,7 +469,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ARGUMENT_LENGTH", lang)
+                    .setContent(t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang)
                             .replace("PH_CMD", "/makeadmin [PLAYER]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -481,7 +481,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (player == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -511,7 +511,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         int playersLeft = Server.getPlayerCount();
         if (playersLeft == 0) {
-            responseMessage = t.get("CMD_OUT_RESTART_NOW", lang);
+            responseMessage = t.get("TC_CMD_OUT_RESTART_NOW", lang);
 
             interaction.createImmediateResponder()
                     .setContent(responseMessage)
@@ -525,12 +525,12 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
             for (Player p : Server.getAllPlayers()) {
                 String l = p.getSystemLanguage();
                 p.sendTextMessage(c.warning + plugin.getName() + ":>" + c.text
-                        + t.get("BC_RESTART", l)
+                        + t.get("TC_BC_RESTART", l)
                                 .replace("PH_DISCORDUSER", user.getDisplayName(interaction.getServer().get())));
             }
 
             plugin.setFlagRestart(true);
-            responseMessage = t.get("CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + "");
+            responseMessage = t.get("TC_CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + "");
 
             interaction.createImmediateResponder()
                     .setContent(responseMessage)
@@ -565,7 +565,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ARGUMENT_LENGTH", lang)
+                    .setContent(t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang)
                             .replace("PH_CMD", "/sethealth [PLAYER] [INT]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -576,7 +576,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -608,7 +608,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ARGUMENT_LENGTH", lang)
+                    .setContent(t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang)
                             .replace("PH_CMD", "/sethunger [PLAYER] [INT]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -619,7 +619,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -650,7 +650,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ARGUMENT_LENGTH", lang)
+                    .setContent(t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang)
                             .replace("PH_CMD", "/setthirst [PLAYER] [INT]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -661,7 +661,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -738,7 +738,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (weatherToSet.isEmpty())
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ILLEGAL_ARGUMENTS", lang).replace("PH_CMD", "/setweather [Weather]")
+                    .setContent(t.get("TC_CMD_ERR_ILLEGAL_ARGUMENTS", lang).replace("PH_CMD", "/setweather [Weather]")
                             .replace("PH_ARGUMENT", "Weather").replace("PH_ARGS_AVAILABLE", sb.toString()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -769,7 +769,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (playerName == null || content == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang))
+                    .setContent(t.get("TC_CMD_ERR_SUPPORT_ARGUMENTS", lang))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -779,7 +779,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -801,7 +801,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerNameA == null || playerNameB == null) {
             interaction.createImmediateResponder()
                     .setContent(
-                            t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD",
+                            t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD",
                                     "/teleporttoplayer [PLAYERNAME] [PLAYERNAME]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -813,14 +813,14 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         if (player == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerNameA.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerNameA.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
         }
         if (targetPlayer == null) {
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerNameB.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerNameB.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;
@@ -848,7 +848,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (playerName == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_ARGUMENT_LENGTH", lang)
+                    .setContent(t.get("TC_CMD_ERR_ARGUMENT_LENGTH", lang)
                             .replace("PH_CMD", "/unadmin [PLAYER]"))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
@@ -860,7 +860,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         if (player == null) {
 
             interaction.createImmediateResponder()
-                    .setContent(t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
+                    .setContent(t.get("TC_CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName.get()))
                     .setFlags(MessageFlag.EPHEMERAL)
                     .respond().join();
             return;

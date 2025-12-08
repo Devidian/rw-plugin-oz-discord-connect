@@ -179,7 +179,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			}
 		};
 		activityTimer.schedule(activityTask, 0, 10000); // Check every 10 seconds
-		this.statusNotification("STATUS_ENABLED");
+		this.statusNotification("TC_STATUS_ENABLED");
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 */
 	@Override
 	public void onDisable() {
-		this.statusNotification("STATUS_DISABLED");
+		this.statusNotification("TC_STATUS_DISABLED");
 		if (s.botEnable) {
 			JavaCordBot.disconnect();
 			DiscordBot = null;
@@ -219,7 +219,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			// Invalid number of arguments (0)
 			if (cmdParts.length < 2) {
 				player.sendTextMessage(c.error + this.getName() + ":>" + c.text
-						+ t.get("MSG_CMD_ERR_ARGUMENTS", lang).replace("PH_CMD", c.error + command + c.text)
+						+ t.get("TC_MSG_CMD_ERR_ARGUMENTS", lang).replace("PH_CMD", c.error + command + c.text)
 								.replace("PH_COMMAND_HELP", c.command + "/" + pluginCMD + " help\n" + c.text));
 				return;
 			}
@@ -231,23 +231,23 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					boolean canTriggerRestart = s.allowRestart && (player.isAdmin() || (!s.restartAdminOnly
 							&& player.getTotalPlayTime() > s.restartMinimumTime && s.restartMinimumTime > 0));
 					if (canTriggerRestart) {
-						String msgDC = t.get("DC_SHUTDOWN", s.botLang).replace("PH_PLAYER", player.getName());
+						String msgDC = t.get("TC_DC_SHUTDOWN", s.botLang).replace("PH_PLAYER", player.getName());
 						this.sendDiscordStatusMessage(msgDC);
-						this.broadcastMessage("BC_SHUTDOWN", player.getName());
+						this.broadcastMessage("TC_BC_SHUTDOWN", player.getName());
 						flagRestart = true;
 					} else {
 						player.sendTextMessage(
-								c.error + this.getName() + ":>" + c.text + t.get("CMD_RESTART_NOTALLOWED", lang));
+								c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_RESTART_NOTALLOWED", lang));
 					}
 					break;
 				case "info":
-					String infoMessage = t.get("CMD_INFO", lang)
+					String infoMessage = t.get("TC_CMD_INFO", lang)
 							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
 							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text);
 					player.sendTextMessage(c.okay + this.getName() + ":> " + c.text + infoMessage);
 					break;
 				case "help":
-					String helpMessage = t.get("CMD_HELP", lang)
+					String helpMessage = t.get("TC_CMD_HELP", lang)
 							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
 							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
 							.replace("PH_CMD_RESTART", c.command + "/" + pluginCMD + " restart" + c.text)
@@ -257,7 +257,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					player.sendTextMessage(c.okay + this.getName() + ":> " + c.text + helpMessage);
 					break;
 				case "status":
-					String statusMessage = t.get("CMD_STATUS", lang)
+					String statusMessage = t.get("TC_CMD_STATUS", lang)
 							.replace("PH_VERSION", c.okay + this.getDescription("version") + c.text)
 							.replace("PH_LANGUAGE",
 									s.colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage()
@@ -302,7 +302,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 							ImageIO.write(bimg, "jpg", os);
 							this.sendDiscordSupportMessage("SupportTicket", supportMessage, os.toByteArray());
 							player.sendTextMessage(
-									c.okay + this.getName() + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
+									c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 						} catch (Exception e) {
 							// throw new UncheckedIOException(ioe);
 							logger().error(e.toString());
@@ -310,14 +310,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					});
 				} else {
 					this.sendDiscordSupportMessage("SupportTicket", supportMessage);
-					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
+					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 				}
 			} else {
-				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("SUPPORT_NOTAVAILABLE", lang));
+				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_NOTAVAILABLE", lang));
 			}
 		} else if (command.equals("/joinDiscord")) {
 			if (s.joinDiscord.isEmpty()) {
-				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("CMD_JOINDISCORD_NA", lang));
+				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_JOINDISCORD_NA", lang));
 			} else {
 				player.connectToDiscord("https://discord.gg/" + s.joinDiscord);
 			}
@@ -422,7 +422,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 	@EventMethod
 	public void onSeasonChange(SeasonChangeEvent event) {
-		String message = t.get("EVENT_SEASON_CHANGE", s.botLang)
+		String message = t.get("TC_EVENT_SEASON_CHANGE", s.botLang)
 				.replace("PH_SEASON", event.getSeason().toString());
 		eventLogger().info(message);
 		if (s.postTrackedEvents && s.trackSeasonChanges)
@@ -436,7 +436,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		WeatherDefs.Weather defNext = event.getNextWeather();
 		String nextWeatherName = defNext != null ? defNext.name : "";
 
-		String message = t.get("EVENT_WEATHER_CHANGE", s.botLang)
+		String message = t.get("TC_EVENT_WEATHER_CHANGE", s.botLang)
 				.replace("PH_WEATHER_FROM", currentWeatherName)
 				.replace("PH_WEATHER_TO", nextWeatherName);
 
@@ -449,7 +449,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Player player = event.getPlayer();
 
-		String message = t.get("EVENT_PLAYER_TELEPORT", s.botLang)
+		String message = t.get("TC_EVENT_PLAYER_TELEPORT", s.botLang)
 				.replace("PH_PLAYER", player.getName())
 				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""));
 
@@ -461,7 +461,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	@EventMethod
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getPlayer();
-		String message = t.get("EVENT_PLAYER_DEATH", s.botLang)
+		String message = t.get("TC_EVENT_PLAYER_DEATH", s.botLang)
 				.replace("PH_PLAYER", player.getName())
 				.replace("PH_CAUSE", event.getCause().toString())
 				.replace("PH_LOCATION", event.getDeathPosition().toString().replaceAll("[,()]", ""));
@@ -480,7 +480,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		if (s.sendPluginWelcome) {
 			Player player = event.getPlayer();
 			String lang = player.getSystemLanguage();
-			player.sendTextMessage(t.get("MSG_PLUGIN_WELCOME", lang));
+            player.sendTextMessage(t.get("TC_MSG_PLUGIN_WELCOME", lang)
+                    .replace("PH_PLUGIN_NAME", getDescription("name"))
+                    .replace("PH_PLUGIN_VERSION", getDescription("version")));
 		}
 	}
 
@@ -495,7 +497,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			eventLogger().info("Player " + player.getName() + " connected at "
 					+ player.getPosition().toString().replaceAll("[,()]", ""));
 			this.sendDiscordStatusMessage(
-					t.get("EVENT_PLAYER_CONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
+					t.get("TC_EVENT_PLAYER_CONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
 		}
 	}
 
@@ -510,17 +512,17 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			eventLogger().info("Player " + player.getName() + " disconnected at "
 					+ player.getPosition().toString().replaceAll("[,()]", ""));
 			this.sendDiscordStatusMessage(
-					t.get("EVENT_PLAYER_DISCONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
+					t.get("TC_EVENT_PLAYER_DISCONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
 
 		}
 		if (flagRestart) {
 			int playersLeft = Server.getPlayerCount() - 1;
 			if (playersLeft == 0) {
-				this.sendDiscordStatusMessage(t.get("RESTART_PLAYER_LAST", s.botLang));
+				this.sendDiscordStatusMessage(t.get("TC_RESTART_PLAYER_LAST", s.botLang));
 				JavaCordBot.api.updateActivity("Restarting...");
 				restart();
 			} else if (playersLeft > 1) {
-				this.broadcastMessage("BC_PLAYER_REMAIN", playersLeft);
+				this.broadcastMessage("TC_BC_PLAYER_REMAIN", playersLeft);
 			}
 		}
 	}
@@ -539,7 +541,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
 		if (!pickupable || !s.trackPickupables)
 			return;
-		String msg = t.get("EVENT_OBJECT_REMOVE", s.botLang)
+		String msg = t.get("TC_EVENT_OBJECT_REMOVE", s.botLang)
 				.replace("PH_PLAYER", player.getName())
 				.replace("PH_OBJECT_NAME", name)
 				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""))
@@ -562,7 +564,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
 		if (!pickupable || !s.trackPickupables)
 			return;
-		String msg = t.get("EVENT_OBJECT_DESTROY", s.botLang)
+		String msg = t.get("TC_EVENT_OBJECT_DESTROY", s.botLang)
 				.replace("PH_PLAYER", player.getName())
 				.replace("PH_OBJECT_NAME", name)
 				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""))
@@ -601,7 +603,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 		if (npc.getTypeID() == Npcs.Type.Mount.value && s.trackMountKill) {
 			// a mount was killed
-			String msg = t.get("EVENT_KILL_MOUNT", s.botLang)
+			String msg = t.get("TC_EVENT_KILL_MOUNT", s.botLang)
 					.replace("PH_PLAYER", player.getName())
 					.replace("PH_NPC_NAME", replacementNPCNameString)
 					.replace("PH_NPC_CLASS", replacementNPCClassString)
@@ -613,7 +615,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		} else if (npc.getTypeID() == Npcs.Type.Animal.value && s.trackNonHostileAnimalKill
 				&& npc.getDefinition().behaviour.value != Behaviour.Aggressive.value) {
 			// Non agressive animal was killed
-			String msg = t.get("EVENT_KILL_ANIMAL", s.botLang)
+			String msg = t.get("TC_EVENT_KILL_ANIMAL", s.botLang)
 					.replace("PH_PLAYER", player.getName())
 					.replace("PH_NPC_NAME", replacementNPCNameString)
 					.replace("PH_NPC_CLASS", replacementNPCClassString)
@@ -954,17 +956,17 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					int playerNum = Server.getPlayerCount();
 					if (playerNum > 0) {
 						logger().info("Setting restart flag for scheduled server-restart");
-						broadcastMessage("RS_SCHEDULE_INFO");
+						broadcastMessage("TC_RS_SCHEDULE_INFO");
 						flagRestart = true;
 						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("STATUS_RESTART_FLAG");
+							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_FLAG");
 						if (s.forceRestartAfter > 0) {
-							broadcastMessage("RS_SCHEDULE_WARN", s.forceRestartAfter);
+							broadcastMessage("TC_RS_SCHEDULE_WARN", s.forceRestartAfter);
 						}
 					} else {
 						logger().info("Restarting server now (scheduled)");
 						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("STATUS_RESTART_SCHEDULED");
+							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_SCHEDULED");
 						restart();
 					}
 				}
@@ -1050,7 +1052,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	@Override
 	public void onSettingsChanged(Path settingsPath) {
 		if (s.reportSettingsChanged) {
-			this.sendDiscordStatusMessage(t.get("UPDATE_SETTINGS", s.botLang));
+			this.sendDiscordStatusMessage(t.get("TC_UPDATE_SETTINGS", s.botLang));
 		}
 		s.initSettings(settingsPath.toString());
 		this.initialize();
@@ -1064,7 +1066,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 		JavaCordBot.api.updateActivity("Restarting soon...");
 
-		instance.statusNotification("STATUS_RESTART_FORCED");
+		instance.statusNotification("TC_STATUS_RESTART_FORCED");
 		instance.executeDelayed(5, () -> {
 			Server.sendInputCommand("restart");
 		});

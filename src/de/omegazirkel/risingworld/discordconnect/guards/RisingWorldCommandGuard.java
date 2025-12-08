@@ -23,11 +23,11 @@ public class RisingWorldCommandGuard {
 
         
         if (commandLevel == 0) {
-            ch.sendMessage(t.get("CMD_ERR_DISABLED", lang).replace("PH_CMD", command));
+            ch.sendMessage(t.get("TC_CMD_ERR_DISABLED", lang).replace("PH_CMD", command));
             message.addReaction("✋");
             return false;
         } else if (commandLevel > 1 && !canExecuteSecureCommands) {
-            ch.sendMessage(t.get("CMD_ERR_ADMIN_ONLY", lang).replace("PH_CMD", command));
+            ch.sendMessage(t.get("TC_CMD_ERR_ADMIN_ONLY", lang).replace("PH_CMD", command));
             message.addReaction("✋");
             return false;
         } else {

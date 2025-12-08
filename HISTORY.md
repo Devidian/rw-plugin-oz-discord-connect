@@ -4,6 +4,7 @@
 
 - refactor: weather and season event messages now have translated weather and season
 - refactor: moved `getRequiredCommands` from `JavaCordBot` to `CommandRegistry`
+- refactor: prefixed all translation strings with `TC_` to align them (and better find them)
 
 ## [0.17.0] - 2025-12-08 | Settings refactored, main class rename, general strurcture refactoring
 
