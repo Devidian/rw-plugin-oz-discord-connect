@@ -8,7 +8,7 @@
 
     <groupId>com.github.devidian</groupId>
     <artifactId>rw-plugin-oz-discord-connect</artifactId>
-    <version>0.17.0</version>
+    <version>0.17.1</version>
 
     <name>OZDiscordConnect</name>
     <description>Rising World Discord-Connect Plugin by OmegaZirkel.de</description>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.10.0</version>
+            <version>0.10.1</version>
             <scope>provided</scope>
         </dependency>
 

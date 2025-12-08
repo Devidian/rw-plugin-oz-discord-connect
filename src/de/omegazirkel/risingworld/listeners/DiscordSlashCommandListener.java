@@ -1,7 +1,6 @@
 package de.omegazirkel.risingworld.listeners;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -25,14 +24,13 @@ import net.risingworld.api.database.WorldDatabase;
 import net.risingworld.api.database.WorldDatabase.Target;
 import net.risingworld.api.definitions.Definitions;
 import net.risingworld.api.definitions.WeatherDefs;
-import net.risingworld.api.definitions.WeatherDefs.Weather;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.objects.Time.Unit;
 
 public class DiscordSlashCommandListener implements SlashCommandCreateListener {
     static final Colors c = Colors.getInstance();
     static final PluginSettings s = PluginSettings.getInstance();
-    static final I18n t = I18n.getInstance();
+    static final I18n t = I18n.getInstance(DiscordConnect.instance.getDescription("name"));
 
     static DiscordConnect getPlugin() {
         return DiscordConnect.instance;
@@ -710,27 +708,27 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
         Optional<String> weatherToSet = interaction.getArgumentStringValueByName("weatherName");
         StringBuilder sb = new StringBuilder();
-        
+
         // List<Weather> l = Arrays.asList(
-        //         WeatherDefs.Blizzard,
-        //         WeatherDefs.Breeze,
-        //         WeatherDefs.Clear,
-        //         WeatherDefs.Cold,
-        //         WeatherDefs.ColdFog,
-        //         WeatherDefs.Default,
-        //         WeatherDefs.DenseFog,
-        //         WeatherDefs.Fog,
-        //         WeatherDefs.HeavyRain,
-        //         WeatherDefs.HeavySnow,
-        //         WeatherDefs.LightRain,
-        //         WeatherDefs.LightSnow,
-        //         WeatherDefs.Overcast,
-        //         WeatherDefs.Rain,
-        //         WeatherDefs.Snow,
-        //         WeatherDefs.Storm,
-        //         WeatherDefs.SunnySnow,
-        //         WeatherDefs.Thaw,
-        //         WeatherDefs.Wind);
+        // WeatherDefs.Blizzard,
+        // WeatherDefs.Breeze,
+        // WeatherDefs.Clear,
+        // WeatherDefs.Cold,
+        // WeatherDefs.ColdFog,
+        // WeatherDefs.Default,
+        // WeatherDefs.DenseFog,
+        // WeatherDefs.Fog,
+        // WeatherDefs.HeavyRain,
+        // WeatherDefs.HeavySnow,
+        // WeatherDefs.LightRain,
+        // WeatherDefs.LightSnow,
+        // WeatherDefs.Overcast,
+        // WeatherDefs.Rain,
+        // WeatherDefs.Snow,
+        // WeatherDefs.Storm,
+        // WeatherDefs.SunnySnow,
+        // WeatherDefs.Thaw,
+        // WeatherDefs.Wind);
         for (WeatherDefs.Weather weather : Definitions.getAllWeathers()) {
             if (weather != null)
                 sb.append(weather.name + "\n");

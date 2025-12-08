@@ -14,7 +14,7 @@ import net.risingworld.api.Server;
 public class DiscordChatListener implements MessageCreateListener {
     static final Colors c = Colors.getInstance();
     static final PluginSettings s = PluginSettings.getInstance();
-    static final I18n t = I18n.getInstance();
+    static final I18n t = I18n.getInstance(DiscordConnect.instance.getDescription("name"));
 
 
     static DiscordConnect getPlugin() {
