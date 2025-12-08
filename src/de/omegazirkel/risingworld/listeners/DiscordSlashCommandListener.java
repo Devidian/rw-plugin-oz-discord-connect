@@ -25,6 +25,7 @@ import net.risingworld.api.database.WorldDatabase;
 import net.risingworld.api.database.WorldDatabase.Target;
 import net.risingworld.api.definitions.Definitions;
 import net.risingworld.api.definitions.WeatherDefs;
+import net.risingworld.api.definitions.WeatherDefs.Weather;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.objects.Time.Unit;
 
@@ -344,10 +345,10 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
     private void handleGetTimeCommand(SlashCommandInteraction interaction) {
         String lang = s.botLang;
-        
+        String season = t.get("SEASON_" + Server.getCurrentSeason().toString().toUpperCase(), lang);
         String response = t.get("CMD_OUT_TIME", lang)
                 .replace("PH_TIME", Server.getGameTime(Unit.Hours) + ":" + Server.getGameTime(Unit.Minutes))
-                .replace("PH_SEASON", Server.getCurrentSeason().toString())
+                .replace("PH_SEASON", season)
                 .replace("PH_YEAR", Server.getGameTime(Unit.Years) + "")
                 .replace("PH_DAY", Server.getGameTime(Unit.Days) + "");
         interaction.createImmediateResponder()
@@ -368,7 +369,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         String lang = s.botLang;
 
         WeatherDefs.Weather defCurrent = Server.getCurrentWeather();
-        String currentWeatherName = defCurrent.name;
+        String currentWeatherName = t.get("WEATHER_" + defCurrent.name.toUpperCase(), lang);
         interaction.createImmediateResponder()
                 .setContent(t.get("CMD_OUT_WEATHER", lang).replace("PH_WEATHER", currentWeatherName))
                 .setFlags(MessageFlag.EPHEMERAL)
@@ -464,7 +465,6 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         User discordUser = interaction.getUser();
         Optional<String> playerName = interaction.getArgumentStringValueByName("playername");
         String lang = s.botLang;
-        
 
         if (playerName == null) {
 
@@ -506,7 +506,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         User user = interaction.getUser();
         DiscordConnect plugin = getPlugin();
         String lang = s.botLang;
-        
+
         String responseMessage;
 
         int playersLeft = Server.getPlayerCount();
@@ -543,7 +543,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         // User user = interaction.getUser();
         DiscordConnect plugin = getPlugin();
         // String lang = s.botLang;
-        // 
+        //
         // String responseMessage;
 
         interaction.createImmediateResponder()
@@ -559,7 +559,6 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
     private void handleSetHealthCommand(SlashCommandInteraction interaction) {
         User user = interaction.getUser();
         String lang = s.botLang;
-        
 
         Optional<String> playerName = interaction.getArgumentStringValueByName("playername");
         Integer health = interaction.getArgumentLongValueByName("intValue").orElse(100l).intValue();
@@ -708,9 +707,30 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
 
     private void handleSetWeatherCommand(SlashCommandInteraction interaction) {
         String lang = s.botLang;
-        
+
         Optional<String> weatherToSet = interaction.getArgumentStringValueByName("weatherName");
         StringBuilder sb = new StringBuilder();
+        
+        // List<Weather> l = Arrays.asList(
+        //         WeatherDefs.Blizzard,
+        //         WeatherDefs.Breeze,
+        //         WeatherDefs.Clear,
+        //         WeatherDefs.Cold,
+        //         WeatherDefs.ColdFog,
+        //         WeatherDefs.Default,
+        //         WeatherDefs.DenseFog,
+        //         WeatherDefs.Fog,
+        //         WeatherDefs.HeavyRain,
+        //         WeatherDefs.HeavySnow,
+        //         WeatherDefs.LightRain,
+        //         WeatherDefs.LightSnow,
+        //         WeatherDefs.Overcast,
+        //         WeatherDefs.Rain,
+        //         WeatherDefs.Snow,
+        //         WeatherDefs.Storm,
+        //         WeatherDefs.SunnySnow,
+        //         WeatherDefs.Thaw,
+        //         WeatherDefs.Wind);
         for (WeatherDefs.Weather weather : Definitions.getAllWeathers()) {
             if (weather != null)
                 sb.append(weather.name + "\n");
@@ -746,7 +766,6 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         Optional<String> playerName = interaction.getArgumentStringValueByName("playername");
         Optional<String> content = interaction.getArgumentStringValueByName("text");
         String lang = s.botLang;
-        
 
         if (playerName == null || content == null) {
             interaction.createImmediateResponder()
@@ -778,7 +797,6 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
         Optional<String> playerNameA = interaction.getArgumentStringValueByName("playername");
         Optional<String> playerNameB = interaction.getArgumentStringValueByName("targetPlayerName");
         String lang = s.botLang;
-        
 
         if (playerNameA == null || playerNameB == null) {
             interaction.createImmediateResponder()
@@ -826,7 +844,6 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
     private void handleUnAdminCommand(SlashCommandInteraction interaction) {
         Optional<String> playerName = interaction.getArgumentStringValueByName("playername");
         String lang = s.botLang;
-        
 
         if (playerName == null) {
 

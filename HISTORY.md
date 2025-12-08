@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- refactor: weather and season event messages now have translated weather and season
+- refactor: moved `getRequiredCommands` from `JavaCordBot` to `CommandRegistry`
+
 ## [0.17.0] - 2025-12-08 | Settings refactored, main class rename, general strurcture refactoring
 
 - feat: new public API `sendDiscordMessageToTextChannel` to use in other plugins
