@@ -1,24 +1,25 @@
-package de.omegazirkel.risingworld.guards;
+package de.omegazirkel.risingworld.discordconnect.guards;
 
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
 
-import de.omegazirkel.risingworld.DiscordWebHook;
-import de.omegazirkel.risingworld.JavaCordBot;
+import de.omegazirkel.risingworld.DiscordConnect;
+import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.tools.I18n;
 
 public class RisingWorldCommandGuard {
 
+    private static PluginSettings s = PluginSettings.getInstance();
+
     public static Boolean canUseCommand(String command, Message message) {
-        Short commandLevel = DiscordWebHook.discordCommands.get(command);
+        Short commandLevel = s.discordCommands.get(command);
         MessageAuthor author = message.getAuthor();
-        DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        boolean canExecuteSecureCommands = !plugin.getBotSecure() || author.isBotOwner()
-                || plugin.getBotAdmins().contains(author.getDiscriminatedName());
+        boolean canExecuteSecureCommands = !s.botSecure || author.isBotOwner()
+        || s.botAdmins.contains(author.getDiscriminatedName());
         TextChannel ch = message.getChannel();
-        String lang = plugin.getBotLanguage();
-        I18n t = plugin.getTranslator();
+        String lang = s.botLang;
+        I18n t = DiscordConnect.instance.getTranslator();
 
         
         if (commandLevel == 0) {

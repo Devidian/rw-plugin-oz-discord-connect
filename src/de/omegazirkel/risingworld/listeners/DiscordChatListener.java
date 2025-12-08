@@ -5,23 +5,29 @@ import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
-import de.omegazirkel.risingworld.DiscordWebHook;
-import de.omegazirkel.risingworld.JavaCordBot;
+import de.omegazirkel.risingworld.DiscordConnect;
+import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.tools.Colors;
+import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
 
 public class DiscordChatListener implements MessageCreateListener {
-    private static DiscordWebHook pluginInstance = null;
     static final Colors c = Colors.getInstance();
+    static final PluginSettings s = PluginSettings.getInstance();
+    static final I18n t = I18n.getInstance();
+
+
+    static DiscordConnect getPlugin() {
+        return DiscordConnect.instance;
+    }
 
     public DiscordChatListener() {
-        pluginInstance = JavaCordBot.pluginInstance;
     }
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
 
-        DiscordWebHook.logger().debug("messageCreateEvent");
+        DiscordConnect.logger().debug("messageCreateEvent");
         String content = event.getMessageContent();
         MessageAuthor author = event.getMessageAuthor();
         boolean isUserNotBot = author.isUser() && !author.isYourself();
@@ -29,22 +35,22 @@ public class DiscordChatListener implements MessageCreateListener {
             return; // Do not react to Bot messages
         }
 
-        boolean isAdmin = author.isBotOwner() || pluginInstance.getBotAdmins().contains(author.getIdAsString());
+        boolean isAdmin = author.isBotOwner() || s.botAdmins.contains(author.getIdAsString());
 
         // Not a command, maybe chat? check channel
         String chName = event.getChannel().asServerChannel().map(ServerChannel::getName).orElse(null);
         long chId = event.getChannel().getId();
-        if (chName.equalsIgnoreCase(pluginInstance.getBotChatChannelName())
-                || chId == pluginInstance.getBotChatChannelId()) {
-            String color = pluginInstance.getColorLocalDiscord();
+        if (chName.equalsIgnoreCase(s.botChatChannelName)
+                || chId == s.chatChannelId) {
+            String color = s.colorLocalDiscord;
             String group = "";
-            if (isAdmin && pluginInstance.getShowGroupSetting()) {
-                color = pluginInstance.getColorLocalAdmin();
+            if (isAdmin && s.showGroup) {
+                color = s.colorLocalAdmin;
                 group = " (discord/admin)";
             }
             String displayName = author.getDisplayName();
-            Server.broadcastTextMessage(color + (DiscordWebHook.defaultChatPrefix) + displayName + group + ": "
-                    + pluginInstance.getColorEndTag() + content);
+            Server.broadcastTextMessage(color + (s.defaultChatPrefix) + displayName + group + ": "
+                    + c.endTag + content);
         }
 
     }

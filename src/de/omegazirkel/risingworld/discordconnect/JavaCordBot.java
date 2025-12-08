@@ -1,4 +1,4 @@
-package de.omegazirkel.risingworld;
+package de.omegazirkel.risingworld.discordconnect;
 
 import java.util.List;
 
@@ -9,22 +9,26 @@ import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javacord.api.listener.GloballyAttachableListener;
 
+import de.omegazirkel.risingworld.DiscordConnect;
 import de.omegazirkel.risingworld.listeners.DiscordChatListener;
 import de.omegazirkel.risingworld.listeners.DiscordSlashCommandListener;
 import de.omegazirkel.risingworld.tools.OZLogger;
 
 public class JavaCordBot {
 
-    public static DiscordWebHook pluginInstance = null;
+    public static DiscordConnect pluginInstance = null;
     public static DiscordApi api = null;
     private static boolean initialized = false;
+    private static PluginSettings s = PluginSettings.getInstance();
+
 
     public static OZLogger logger() {
         return OZLogger.getInstance("OZ.DiscordConnect.JavaCord");
     }
 
-    public JavaCordBot(final DiscordWebHook plugin) {
+    public JavaCordBot(final DiscordConnect plugin) {
         pluginInstance = plugin;
+        logger().setLevel(s.logLevel);
     }
 
     public static void disconnect() {
@@ -45,7 +49,7 @@ public class JavaCordBot {
         }
         initialized = true;
         api = new DiscordApiBuilder()
-                .setToken(pluginInstance.getBotToken())
+                .setToken(s.botToken)
                 // .setAllIntents()
                 .addIntents(Intent.MESSAGE_CONTENT)
                 .login()
@@ -113,7 +117,8 @@ public class JavaCordBot {
                 "Channel to send the message to default: local");
         return List.of(
                 new CmdDef("getversion", "Show the current DiscordConnect version", List.of()),
-                new CmdDef("ban", "Ban a player", List.of(playerIdOption, playerNameOption, durationInSec, reasonOption)),
+                new CmdDef("ban", "Ban a player",
+                        List.of(playerIdOption, playerNameOption, durationInSec, reasonOption)),
                 new CmdDef("restart", "Trigger server restart", List.of()),
                 new CmdDef("reloadplugins", "Trigger plugin reload", List.of()),
                 new CmdDef("unban", "Remove a player from ban", List.of(playerIdOption)),

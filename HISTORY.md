@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [0.17.0] - 2025-12-08 | Settings refactored, main class rename, general strurcture refactoring
+
+- feat: new public API `sendDiscordMessageToTextChannel` to use in other plugins
 - feat: new properties for chat configuration
   - `defaultChatPrefix` => ingame chat prefix for default channel 
     - default: "[LOCAL] "
@@ -12,6 +15,9 @@
   - `trackWeatherChanges`
   - `trackSeasonChanges`
   - `trackPlayerTeleports`
+- refactor,BREAKING: updated OZTools dependency to `0.10.0` which includes breaking changes.
+- refactor: moved all non main classes to subdirectory to prevent classname conflicts with other plugins (0.16.14)
+- refactor: moved PluginSettings to its own class to downsize main class (0.16.14)
 - refactor: removed `reportStatusDisabled`, renamed `reportStatusEnabled` to `reportServerStatus` (0.16.12)
 - refactor: removed `statusEnabledMessage` and `statusDisabledMessage` (0.16.12)
   - messages added to translation files `STATUS_*`, with placeholder:

@@ -1,4 +1,4 @@
-package de.omegazirkel.risingworld;
+package de.omegazirkel.risingworld.discordconnect;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

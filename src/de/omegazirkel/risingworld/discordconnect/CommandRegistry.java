@@ -1,4 +1,4 @@
-package de.omegazirkel.risingworld;
+package de.omegazirkel.risingworld.discordconnect;
 
 import java.util.HashSet;
 import java.util.List;
