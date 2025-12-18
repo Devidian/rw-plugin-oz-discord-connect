@@ -107,6 +107,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		flagRestart = value;
 	}
 
+	public String getBotLanguage() {
+		return s.botLang;
+	}
+
 	public String getStatusUserName() {
 		String username = s.statusUsername;
 		if (s.useServerName) {
@@ -187,6 +191,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 */
 	@Override
 	public void onDisable() {
+		logger().warn("⚠️ Disabling " + this.getName() + " ...");
 		this.statusNotification("TC_STATUS_DISABLED");
 		if (s.botEnable) {
 			JavaCordBot.disconnect();
@@ -313,7 +318,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 				}
 			} else {
-				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_NOTAVAILABLE", lang));
+				player.sendTextMessage(
+						c.error + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_NOTAVAILABLE", lang));
 			}
 		} else if (command.equals("/joinDiscord")) {
 			if (s.joinDiscord.isEmpty()) {
@@ -437,8 +443,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		String nextWeatherName = defNext != null ? defNext.name : "";
 
 		String message = t.get("TC_EVENT_WEATHER_CHANGE", s.botLang)
-				.replace("PH_WEATHER_FROM", currentWeatherName)
-				.replace("PH_WEATHER_TO", nextWeatherName);
+				.replace("PH_WEATHER_FROM", t.get("TC_WEATHER_" + currentWeatherName.toUpperCase(), s.botLang))
+				.replace("PH_WEATHER_TO", t.get("TC_WEATHER_" + nextWeatherName.toUpperCase(), s.botLang));
 
 		eventLogger().info(message);
 		if (s.postTrackedEvents && s.trackWeatherChanges)
@@ -480,9 +486,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		if (s.sendPluginWelcome) {
 			Player player = event.getPlayer();
 			String lang = player.getSystemLanguage();
-            player.sendTextMessage(t.get("TC_MSG_PLUGIN_WELCOME", lang)
-                    .replace("PH_PLUGIN_NAME", getDescription("name"))
-                    .replace("PH_PLUGIN_VERSION", getDescription("version")));
+			player.sendTextMessage(t.get("TC_MSG_PLUGIN_WELCOME", lang)
+					.replace("PH_PLUGIN_NAME", getDescription("name"))
+					.replace("PH_PLUGIN_CMD", pluginCMD)
+					.replace("PH_PLUGIN_VERSION", getDescription("version")));
 		}
 	}
 

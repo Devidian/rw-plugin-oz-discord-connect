@@ -1,6 +1,6 @@
 name: "OZ - Discord Connect"
 main: de.omegazirkel.risingworld.DiscordConnect
-version: 0.17.1
+version: 0.17.2
 author: "Maik 'Devidian' Laschober"
 team: "Omega Zirkel"
 description: "This Plugin can be used to display ingame chat in a Discord channel"
