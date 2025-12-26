@@ -1063,6 +1063,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 		s.initSettings(settingsPath.toString());
 		this.initialize();
+		// set logger level
+		Utils.logger().setLevel(s.logLevel);
+		JavaCordBot.logger().setLevel(s.logLevel);
+		logger().setLevel(s.logLevel);
 	}
 
 	public static void forceRestart() {

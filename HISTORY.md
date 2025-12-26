@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - fix: missing weather translations
+- fix: en translation issues [0.17.3]
 - fix: I18n overriding each other (different plugins)
 - refactor: weather and season event messages now have translated weather and season
 - refactor: moved `getRequiredCommands` from `JavaCordBot` to `CommandRegistry`
