@@ -41,10 +41,12 @@ import org.json.simple.JSONObject;
 import de.omegazirkel.risingworld.discordconnect.JavaCordBot;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.discordconnect.Utils;
+import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginSettings;
 import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
+import de.omegazirkel.risingworld.tools.ui.PlayerPluginSettingsOverlay;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
 import net.risingworld.api.definitions.Npcs;
@@ -88,6 +90,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	private static I18n t = null;
 	private static PluginSettings s = null;
 	static JavaCordBot DiscordBot = null;
+	public static String name;
 
 	public static DiscordConnect instance = null;
 
@@ -125,6 +128,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 	@Override
 	public void onEnable() {
+		name = this.getDescription("name");
 		DiscordConnect.instance = this; // for timer
 		// Register event listener
 		registerEventListener(this);
@@ -137,6 +141,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 		s.initSettings();
 		this.initialize();
+
+		// register plugin settings
+		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings());
 		logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 
 	}

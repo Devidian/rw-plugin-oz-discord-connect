@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-01-05 | Player-plugin-settings implemented
+
+- feat: player plugin settings implemented (currently we dont have any player settings)
 - fix: missing weather translations
 - fix: en translation issues [0.17.3]
 - fix: I18n overriding each other (different plugins)

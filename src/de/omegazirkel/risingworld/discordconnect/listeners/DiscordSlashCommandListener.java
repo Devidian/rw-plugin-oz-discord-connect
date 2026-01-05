@@ -1,4 +1,4 @@
-package de.omegazirkel.risingworld.listeners;
+package de.omegazirkel.risingworld.discordconnect.listeners;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

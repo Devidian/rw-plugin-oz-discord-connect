@@ -1,4 +1,4 @@
-package de.omegazirkel.risingworld.listeners;
+package de.omegazirkel.risingworld.discordconnect.listeners;
 
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.MessageAuthor;

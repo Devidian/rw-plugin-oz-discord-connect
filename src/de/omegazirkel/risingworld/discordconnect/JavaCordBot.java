@@ -8,8 +8,8 @@ import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.listener.GloballyAttachableListener;
 
 import de.omegazirkel.risingworld.DiscordConnect;
-import de.omegazirkel.risingworld.listeners.DiscordChatListener;
-import de.omegazirkel.risingworld.listeners.DiscordSlashCommandListener;
+import de.omegazirkel.risingworld.discordconnect.listeners.DiscordChatListener;
+import de.omegazirkel.risingworld.discordconnect.listeners.DiscordSlashCommandListener;
 import de.omegazirkel.risingworld.tools.OZLogger;
 
 public class JavaCordBot {
