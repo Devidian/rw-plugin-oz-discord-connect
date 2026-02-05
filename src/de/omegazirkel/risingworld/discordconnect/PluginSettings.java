@@ -21,7 +21,7 @@ public class PluginSettings {
 	private static DiscordConnect plugin;
 
 	private static OZLogger logger() {
-		return OZLogger.getInstance("OZ.DiscordConnect.Settings");
+		return DiscordConnect.logger();
 	}
 
 	// Settings
@@ -48,7 +48,7 @@ public class PluginSettings {
 	public long supportChannelId = 0;
 
 	// Discord status settings
-	public boolean postStatus = false;
+	// public boolean postStatus = false;
 	public boolean useServerName = false;
 	public boolean reportServerStatus = false;
 	public boolean reportSettingsChanged = true;
@@ -57,15 +57,6 @@ public class PluginSettings {
 	public URI webHookStatusUrl = null;
 	public long statusChannelId = 0;
 
-	// Discord event settings
-	public boolean postTrackedEvents = false;
-	public boolean trackMountKill = false;
-	public boolean trackNonHostileAnimalKill = false;
-	public boolean trackPickupables = false;
-	public boolean trackPlayerDeaths = false;
-	public boolean trackPlayerTeleports = false;
-	public boolean trackWeatherChanges = false;
-	public boolean trackSeasonChanges = false;
 	public URI webHookEventUrl = null;
 	public long eventChannelId = 0;
 
@@ -144,7 +135,7 @@ public class PluginSettings {
 			joinDiscord = settings.getProperty("joinDiscord", "");
 			overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
 
-			postStatus = settings.getProperty("postStatus", "false").contentEquals("true");
+			// postStatus = settings.getProperty("postStatus", "false").contentEquals("true");
 			reportServerStatus = settings.getProperty("reportServerStatus", "true").contentEquals("true");
 			reportSettingsChanged = settings.getProperty("reportSettingsChanged", "true").contentEquals("true");
 			reportJarChanged = settings.getProperty("reportJarChanged", "true").contentEquals("true");
@@ -190,15 +181,15 @@ public class PluginSettings {
 			discordCommands.put("setthirst", Short.parseShort(settings.getProperty("botCMDsetthirst", "2")));
 			discordCommands.put("reloadplugins", Short.parseShort(settings.getProperty("botCMDreloadplugins", "2")));
 			// badass stuff
-			postTrackedEvents = settings.getProperty("postTrackedEvents", "false").contentEquals("true");
-			trackMountKill = settings.getProperty("trackMountKill", "false").contentEquals("true");
-			trackNonHostileAnimalKill = settings.getProperty("trackNonHostileAnimalKill", "false")
-					.contentEquals("true");
-			trackPickupables = settings.getProperty("trackPickupables", "false").contentEquals("true");
-			trackPlayerDeaths = settings.getProperty("trackPlayerDeaths", "false").contentEquals("true");
-			trackPlayerTeleports = settings.getProperty("trackPlayerTeleports", "false").contentEquals("true");
-			trackWeatherChanges = settings.getProperty("trackWeatherChanges", "false").contentEquals("true");
-			trackSeasonChanges = settings.getProperty("trackSeasonChanges", "false").contentEquals("true");
+			// postTrackedEvents = settings.getProperty("postTrackedEvents", "false").contentEquals("true");
+			// trackMountKill = settings.getProperty("trackMountKill", "false").contentEquals("true");
+			// trackNonHostileAnimalKill = settings.getProperty("trackNonHostileAnimalKill", "false")
+			// 		.contentEquals("true");
+			// trackPickupables = settings.getProperty("trackPickupables", "false").contentEquals("true");
+			// trackPlayerDeaths = settings.getProperty("trackPlayerDeaths", "false").contentEquals("true");
+			// trackPlayerTeleports = settings.getProperty("trackPlayerTeleports", "false").contentEquals("true");
+			// trackWeatherChanges = settings.getProperty("trackWeatherChanges", "false").contentEquals("true");
+			// trackSeasonChanges = settings.getProperty("trackSeasonChanges", "false").contentEquals("true");
 
 			// colors
 
@@ -245,13 +236,12 @@ public class PluginSettings {
 			logger().info(plugin.getName() + " Plugin settings loaded");
 
 			logger().info("Will send chat to Discord: " + String.valueOf(postChat));
-			logger().info("Will send status to Discord: " + String.valueOf(postStatus));
+			// logger().info("Will send status to Discord: " + String.valueOf(postStatus));
 			logger().info("Will send support tickets to Discord: " + String.valueOf(postSupport));
 			logger().info("Sending welcome message on login is: " + String.valueOf(sendPluginWelcome));
 			logger().info("Loglevel is set to " + logLevel);
 			logger().setLevel(logLevel);
 			DiscordConnect.logger().setLevel(logLevel);
-			DiscordConnect.eventLogger().setLevel(logLevel);
 
 		} catch (IOException ex) {
 			logger().error("IOException on initSettings: " + ex.getMessage());

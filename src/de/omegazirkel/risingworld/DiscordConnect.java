@@ -49,25 +49,12 @@ import de.omegazirkel.risingworld.tools.OZLogger;
 import de.omegazirkel.risingworld.tools.ui.PlayerPluginSettingsOverlay;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
-import net.risingworld.api.definitions.Npcs;
-import net.risingworld.api.definitions.Npcs.Behaviour;
-import net.risingworld.api.definitions.WeatherDefs;
 import net.risingworld.api.events.EventMethod;
 import net.risingworld.api.events.Listener;
-import net.risingworld.api.events.npc.NpcDeathEvent;
-import net.risingworld.api.events.npc.NpcDeathEvent.Cause;
 import net.risingworld.api.events.player.PlayerChatEvent;
 import net.risingworld.api.events.player.PlayerCommandEvent;
-import net.risingworld.api.events.player.PlayerConnectEvent;
-import net.risingworld.api.events.player.PlayerDeathEvent;
 import net.risingworld.api.events.player.PlayerDisconnectEvent;
 import net.risingworld.api.events.player.PlayerSpawnEvent;
-import net.risingworld.api.events.player.PlayerTeleportEvent;
-import net.risingworld.api.events.player.world.PlayerDestroyObjectEvent;
-import net.risingworld.api.events.player.world.PlayerRemoveObjectEvent;
-import net.risingworld.api.events.world.SeasonChangeEvent;
-import net.risingworld.api.events.world.WeatherChangeEvent;
-import net.risingworld.api.objects.Npc;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.utils.Vector3f;
 
@@ -80,10 +67,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 	public static OZLogger logger() {
 		return OZLogger.getInstance("OZ.DiscordConnect");
-	}
-
-	public static OZLogger eventLogger() {
-		return OZLogger.getInstance("OZ.DiscordConnect.Event");
 	}
 
 	static final Colors c = Colors.getInstance();
@@ -433,57 +416,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 	}
 
-	@EventMethod
-	public void onSeasonChange(SeasonChangeEvent event) {
-		String message = t.get("TC_EVENT_SEASON_CHANGE", s.botLang)
-				.replace("PH_SEASON", event.getSeason().toString());
-		eventLogger().info(message);
-		if (s.postTrackedEvents && s.trackSeasonChanges)
-			sendDiscordEventMessage(message);
-	}
-
-	@EventMethod
-	public void onWeatherChange(WeatherChangeEvent event) {
-		WeatherDefs.Weather defCurrent = event.getCurrentWeather();
-		String currentWeatherName = defCurrent.name;
-		WeatherDefs.Weather defNext = event.getNextWeather();
-		String nextWeatherName = defNext != null ? defNext.name : "";
-
-		String message = t.get("TC_EVENT_WEATHER_CHANGE", s.botLang)
-				.replace("PH_WEATHER_FROM", t.get("TC_WEATHER_" + currentWeatherName.toUpperCase(), s.botLang))
-				.replace("PH_WEATHER_TO", t.get("TC_WEATHER_" + nextWeatherName.toUpperCase(), s.botLang));
-
-		eventLogger().info(message);
-		if (s.postTrackedEvents && s.trackWeatherChanges)
-			sendDiscordEventMessage(message);
-	}
-
-	@EventMethod
-	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		Player player = event.getPlayer();
-
-		String message = t.get("TC_EVENT_PLAYER_TELEPORT", s.botLang)
-				.replace("PH_PLAYER", player.getName())
-				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""));
-
-		eventLogger().info(message);
-		if (s.postTrackedEvents && s.trackPlayerTeleports)
-			sendDiscordEventMessage(message);
-	}
-
-	@EventMethod
-	public void onPlayerDeath(PlayerDeathEvent event) {
-		Player player = event.getPlayer();
-		String message = t.get("TC_EVENT_PLAYER_DEATH", s.botLang)
-				.replace("PH_PLAYER", player.getName())
-				.replace("PH_CAUSE", event.getCause().toString())
-				.replace("PH_LOCATION", event.getDeathPosition().toString().replaceAll("[,()]", ""));
-
-		eventLogger().info(message);
-		if (s.postTrackedEvents && s.trackPlayerDeaths)
-			sendDiscordEventMessage(message);
-	}
-
 	/**
 	 *
 	 * @param event
@@ -504,16 +436,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 *
 	 * @param event
 	 */
-	@EventMethod
-	public void onPlayerConnect(PlayerConnectEvent event) {
-		if (s.postStatus) {
-			Player player = event.getPlayer();
-			eventLogger().info("Player " + player.getName() + " connected at "
-					+ player.getPosition().toString().replaceAll("[,()]", ""));
-			this.sendDiscordStatusMessage(
-					t.get("TC_EVENT_PLAYER_CONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
-		}
-	}
 
 	/**
 	 *
@@ -521,14 +443,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 */
 	@EventMethod
 	public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-		if (s.postStatus) {
-			Player player = event.getPlayer();
-			eventLogger().info("Player " + player.getName() + " disconnected at "
-					+ player.getPosition().toString().replaceAll("[,()]", ""));
-			this.sendDiscordStatusMessage(
-					t.get("TC_EVENT_PLAYER_DISCONNECTED", s.botLang).replace("PH_PLAYER", player.getName()));
-
-		}
 		if (flagRestart) {
 			int playersLeft = Server.getPlayerCount() - 1;
 			if (playersLeft == 0) {
@@ -539,112 +453,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				this.broadcastMessage("TC_BC_PLAYER_REMAIN", playersLeft);
 			}
 		}
-	}
-
-	/**
-	 *
-	 * @param event
-	 */
-	@EventMethod
-	public void onPlayerRemoveObject(PlayerRemoveObjectEvent event) {
-		boolean pickupable = event.getObjectDefinition().pickupable;
-		String name = event.getObjectDefinition().name;
-		Player player = event.getPlayer();
-		int posX = event.getChunkPositionX();
-		int posZ = event.getChunkPositionZ();
-		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
-		if (!pickupable || !s.trackPickupables)
-			return;
-		String msg = t.get("TC_EVENT_OBJECT_REMOVE", s.botLang)
-				.replace("PH_PLAYER", player.getName())
-				.replace("PH_OBJECT_NAME", name)
-				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""))
-				.replace("PH_MAP_COORDINATES", posMap);
-		eventLogger().info(msg);
-		this.sendDiscordEventMessage(msg);
-	}
-
-	/**
-	 *
-	 * @param event
-	 */
-	@EventMethod
-	public void onPlayerDestroyObject(PlayerDestroyObjectEvent event) {
-		boolean pickupable = event.getObjectDefinition().pickupable;
-		String name = event.getObjectDefinition().name;
-		Player player = event.getPlayer();
-		int posX = event.getChunkPositionX();
-		int posZ = event.getChunkPositionZ();
-		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
-		if (!pickupable || !s.trackPickupables)
-			return;
-		String msg = t.get("TC_EVENT_OBJECT_DESTROY", s.botLang)
-				.replace("PH_PLAYER", player.getName())
-				.replace("PH_OBJECT_NAME", name)
-				.replace("PH_LOCATION", player.getPosition().toString().replaceAll("[,()]", ""))
-				.replace("PH_MAP_COORDINATES", posMap);
-		eventLogger().warn(msg);
-		this.sendDiscordEventMessage(msg);
-	}
-
-	/**
-	 * track mount and non aggressive animal deaths
-	 *
-	 * @param event
-	 */
-	@EventMethod
-	public void onNpcDeath(NpcDeathEvent event) {
-		// Cause.KilledByPlayer);
-		Npc npc = event.getNpc();
-		String name = npc.getName();
-		String npcClass = npc.getDefinition().name;
-		Vector3f pos = event.getDeathPosition();
-		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
-
-		String replacementNPCNameString = (name != null) ? name : "Unnamed NPC";
-		String replacementNPCClassString = (npcClass != null) ? npcClass : "Unknown class";
-		String replacementLocatioString = (pos != null) ? pos.toString() : "x x x (N/A)";
-		String replacementMapCoordinates = (posMap != null) ? posMap : "xW xN";
-
-		if (event.getCause() != Cause.KilledByPlayer) {
-			eventLogger().debug(
-					"NPC <" + replacementNPCNameString + "> <" + replacementNPCClassString + "> died from "
-							+ event.getCause() + " at "
-							+ replacementLocatioString + " (" + replacementMapCoordinates + ")");
-			return;
-		}
-		Player player = (Player) event.getKiller();
-
-		if (npc.getTypeID() == Npcs.Type.Mount.value && s.trackMountKill) {
-			// a mount was killed
-			String msg = t.get("TC_EVENT_KILL_MOUNT", s.botLang)
-					.replace("PH_PLAYER", player.getName())
-					.replace("PH_NPC_NAME", replacementNPCNameString)
-					.replace("PH_NPC_CLASS", replacementNPCClassString)
-					.replace("PH_LOCATION", replacementLocatioString)
-					.replace("PH_MAP_COORDINATES", replacementMapCoordinates);
-			eventLogger().warn(msg);
-			this.sendDiscordEventMessage(msg);
-			return;
-		} else if (npc.getTypeID() == Npcs.Type.Animal.value && s.trackNonHostileAnimalKill
-				&& npc.getDefinition().behaviour.value != Behaviour.Aggressive.value) {
-			// Non agressive animal was killed
-			String msg = t.get("TC_EVENT_KILL_ANIMAL", s.botLang)
-					.replace("PH_PLAYER", player.getName())
-					.replace("PH_NPC_NAME", replacementNPCNameString)
-					.replace("PH_NPC_CLASS", replacementNPCClassString)
-					.replace("PH_LOCATION", replacementLocatioString)
-					.replace("PH_MAP_COORDINATES", replacementMapCoordinates);
-			eventLogger().warn(msg);
-			this.sendDiscordEventMessage(msg);
-			return;
-		}
-		eventLogger().debug(
-				player.getName()
-						+ " killed NPC <name: " + replacementNPCNameString + "> <class:" + replacementNPCClassString
-						+ "> <typeId: " + npc.getTypeID() + "> <variant: " + npc.getVariant() + "> at "
-						+ replacementLocatioString + " (" + replacementMapCoordinates + ")");
-
 	}
 
 	public void sendDiscordMessageToTextChannel(String message, long channelId) {
@@ -660,6 +468,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	public void sendDiscordMessageToTextChannel(String message, long channelId, byte[] image) {
+		if (channelId == 0){
+			logger().warn("⚠️ channelId = 0, set channelId in plugin settings or deactivate this channel");
+			return;
+		}
 		Optional<Channel> channel = JavaCordBot.api.getChannelById(channelId);
 		if (!channel.isEmpty()) {
 			ServerTextChannel tc = channel.get().asServerTextChannel().get();

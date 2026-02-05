@@ -3,7 +3,7 @@
 ## Current features
 
 - post ingame chat to Discord with usernames
-- post server status messages such as login, logout, startup and shutdown to Discord
+- post server status messages (startup and shutdown) to Discord
 - post support messages using `/support [message]` to a Discord channel
 - every Discord channel can have its own webHook (chat, support and status)
 - admins can trigger server restart with `/ozrestart` that is executed after the last player left the server (it causes server shutdown, you need to be sure that server comes up automatically after that)
@@ -14,7 +14,6 @@
 - support messages now have a screenshot attached
 - normal chat messages wich contain `+screen` or `+s ` (include space) have a screenshot uploaded to discord
 - normal chat messages wich contain `+screennogui` or `+sng ` (include space) have a screenshot without interface
-- `Badass Tracker` tracks kills (mounts, non hostile animals) and remove/destroy of objects
 - Public API for other plugins (status/event channel)
 - Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
 - Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts
@@ -131,7 +130,6 @@ The settings.properties contains all you need to configure this plugin
 | webHookChatUrl              |                 | this is the webHook used for ingame chat                                                                           |
 | overrideAvatar              | true            | -                                                                                                                  |
 | **Status settings**         |                 |                                                                                                                    |
-| postStatus                  | false           | if true, server status messages like player login/out is send to the webHook for Status                            |
 | useServerName               | false           | if true, the servername is used as username for status posts                                                       |
 | reportStatusEnabled         | true            | if true, a message will be posted when the plugin is enabled (server boot)                                         |
 | reportStatusDisabled        | true            | if true, a message will be posted when the plugin is disabled (server shutdown)                                    |
@@ -155,9 +153,3 @@ The settings.properties contains all you need to configure this plugin
 | colorLocalAdmin             | <color=#db3208> | -                                                                                                                  |
 | colorLocalOther             | <color=#dddddd> | -                                                                                                                  |
 | colorLocalDiscord           | <color=#ddddff> | -                                                                                                                  |
-| **Event Tracker settings**  |                 |                                                                                                                    |
-| postTrackedEvents           | false           | -                                                                                                                  |
-| webHookEventUrl             |                 | -                                                                                                                  |
-| trackMountKill              | false           | -                                                                                                                  |
-| trackNonHostileAnimalKill   | false           | -                                                                                                                  |
-| trackPickupables            | false           | -                                                                                                                  |

@@ -6,12 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.omegazirkel.risingworld.DiscordConnect;
 import de.omegazirkel.risingworld.tools.OZLogger;
 
 public class Utils {
 
     public static OZLogger logger() {
-        return OZLogger.getInstance("OZ.DiscordConnect.Utils");
+        return DiscordConnect.logger();
     }
 
     public static File byteArrayToFile(byte[] imageBytes, String fileName) throws IOException {

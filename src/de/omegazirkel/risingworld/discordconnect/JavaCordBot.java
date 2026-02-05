@@ -21,7 +21,7 @@ public class JavaCordBot {
 
 
     public static OZLogger logger() {
-        return OZLogger.getInstance("OZ.DiscordConnect.JavaCord");
+        return DiscordConnect.logger();
     }
 
     public JavaCordBot(final DiscordConnect plugin) {

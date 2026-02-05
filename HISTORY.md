@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-02-05 | Moved tracking features to Admin Utils
+
+- refactor: removed all tracking and logging of events
+  - all event tracking is now handled in `OZ - Admin Utils` plugin
+- refactor: reduced plugin logger to main logger
+  - should keep Logs directory more clean
+
 ## [0.18.0] - 2026-01-05 | Player-plugin-settings implemented
 
 - feat: player plugin settings implemented (currently we dont have any player settings)
