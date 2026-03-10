@@ -70,6 +70,9 @@ public class PluginSettings {
 	public int restartMinimumTime = 86400;// (60 * 60 * 24); // 1 Day default
 	public boolean restartTimed = false; // restart schedule
 	public int forceRestartAfter = 5; // Minutes
+	public boolean useShutdownNotRestart = true;
+
+	// screenshots
 
 	public boolean allowScreenshots = true;
 	public int maxScreenWidth = 1920;
@@ -217,6 +220,7 @@ public class PluginSettings {
 			// "false").contentEquals("true");
 			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "86400"));
 			forceRestartAfter = Integer.parseInt(settings.getProperty("forceRestartAfter", "0"));
+			useShutdownNotRestart = settings.getProperty("useShutdownNotRestart", "true").contentEquals("true");
 
 			// parse next restart time (we only need the next beacause we have to lookup
 			// again after restart)

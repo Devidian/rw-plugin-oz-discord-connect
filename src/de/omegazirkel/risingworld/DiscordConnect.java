@@ -295,7 +295,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						final ByteArrayOutputStream os = new ByteArrayOutputStream();
 						try {
 							ImageIO.write(bimg, "jpg", os);
-							this.sendDiscordSupportMessage("SupportTicket", supportMessage, os.toByteArray());
+							this.sendDiscordSupportMessage("SupportTicket", supportMessage, os.toByteArray(),
+									player.getSystemLanguage());
 							player.sendTextMessage(
 									c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 						} catch (Exception e) {
@@ -304,7 +305,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						}
 					});
 				} else {
-					this.sendDiscordSupportMessage("SupportTicket", supportMessage);
+					this.sendDiscordSupportMessage("SupportTicket", supportMessage, player.getSystemLanguage());
 					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 				}
 			} else {
@@ -371,7 +372,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					try {
 						ImageIO.write(bimg, "jpg", os);
-						this.sendDiscordChatMessage(player.getName(), textToSend, os.toByteArray());
+						this.sendDiscordChatMessage(player.getName(), textToSend, os.toByteArray(),
+								player.getSystemLanguage());
 					} catch (Exception e) {
 						// throw new UncheckedIOException(ioe);
 						logger().error(e.toString());
@@ -381,7 +383,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				if (hasScreenshot == true) {
 					logger().warn("⚠️ Screenshot taking not enabled");
 				}
-				this.sendDiscordChatMessage(player.getName(), noColorText);
+				this.sendDiscordChatMessage(player.getName(), noColorText, player.getSystemLanguage());
 			}
 			if (s.colorizeChat) {
 				broadcastChatMessage(player, noColorText);
@@ -412,7 +414,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			}
 
 			player.sendTextMessage(
-					color + s.defaultChatPrefix + eventPlayer.getName() + group + ": " + c.text + noColorText);
+					color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", eventPlayer.getSystemLanguage())
+							+ eventPlayer.getName() + group + ": " + c.text + noColorText);
 		}
 	}
 
@@ -468,7 +471,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	public void sendDiscordMessageToTextChannel(String message, long channelId, byte[] image) {
-		if (channelId == 0){
+		if (channelId == 0) {
 			logger().warn("⚠️ channelId = 0, set channelId in plugin settings or deactivate this channel");
 			return;
 		}
@@ -639,8 +642,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param username
 	 * @param text
 	 */
-	public void sendDiscordChatMessage(String username, String text) {
-		this.sendDiscordChatMessage(username, text, null);
+	public void sendDiscordChatMessage(String username, String text, String language) {
+		this.sendDiscordChatMessage(username, text, null, language);
 	}
 
 	/**
@@ -649,11 +652,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param text
 	 * @param image
 	 */
-	public void sendDiscordChatMessage(String username, String text, byte[] image) {
+	public void sendDiscordChatMessage(String username, String text, byte[] image, String language) {
 		if (s.webHookChatUrl != null && s.webHookChatUrl.toString() != "")
 			this.sendDiscordMessageToWebHook(username, text, s.webHookChatUrl, image);
 		else if (s.chatChannelId != 0 && JavaCordBot.api != null) {
-			String message = s.discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text);
+			String message = s.discordChatSyntax
+					.replace("**PH_PLAYER**", username)
+					.replace("**PH_MESSAGE**", text)
+					.replace("**PH_PLAYER_LANG**", language);
 			sendDiscordMessageToTextChannel(message, s.chatChannelId, image);
 		} else {
 			logger().error("❌ Unable to send chat message: " + text);
@@ -664,10 +670,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 *
 	 * @param username
 	 * @param text
-	 * @param channel
+	 * @param language
 	 */
-	private void sendDiscordSupportMessage(String username, String text) {
-		this.sendDiscordSupportMessage(username, text, null);
+	private void sendDiscordSupportMessage(String username, String text, String language) {
+		this.sendDiscordSupportMessage(username, text, null, language);
 	}
 
 	/**
@@ -676,11 +682,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param text
 	 * @param image
 	 */
-	private void sendDiscordSupportMessage(String username, String text, byte[] image) {
+	private void sendDiscordSupportMessage(String username, String text, byte[] image, String language) {
 		if (s.webHookSupportUrl != null && s.webHookSupportUrl.toString() != "")
 			this.sendDiscordMessageToWebHook(username, text, s.webHookSupportUrl, image);
 		else if (s.supportChannelId != 0 && JavaCordBot.api != null) {
-			String message = s.discordChatSyntax.replace("**PH_PLAYER**", username).replace("**PH_MESSAGE**", text);
+			String message = s.discordChatSyntax
+					.replace("**PH_PLAYER**", username)
+					.replace("**PH_MESSAGE**", text)
+					.replace("**PH_PLAYER_LANG**", language);
 			this.sendDiscordMessageToTextChannel(message, s.supportChannelId, image);
 		} else {
 			logger().error("❌ Unable to send support message: " + text);
@@ -793,6 +802,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						logger().info("Restarting server now (scheduled)");
 						if (DiscordConnect.instance != null)
 							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_SCHEDULED");
+
 						restart();
 					}
 				}
@@ -898,7 +908,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 		instance.statusNotification("TC_STATUS_RESTART_FORCED");
 		instance.executeDelayed(5, () -> {
-			Server.sendInputCommand("restart");
+			if (s.useShutdownNotRestart)
+				Server.sendInputCommand("shutdown");
+			else
+				Server.sendInputCommand("restart");
 		});
 	}
 
@@ -912,7 +925,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 		JavaCordBot.api.updateActivity("Restarting soon...");
 		instance.executeDelayed(5, () -> {
-			Server.sendInputCommand("restart");
+			if (s.useShutdownNotRestart)
+				Server.sendInputCommand("shutdown");
+			else
+				Server.sendInputCommand("restart");
 		});
 	}
 

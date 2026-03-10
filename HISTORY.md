@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- feat: new placeholder for chat to discord `**PH_PLAYER_LANGUAGE**`
+- feat: new placeholder for chat-prefix ingame `**PH_LANGUAGE**`
+  - replaced with the players system language
+- feat: new setting `useShutdownNotRestart` executes shutdown not restart if true (default=true)
+
+
 ## [0.19.0] - 2026-02-05 | Moved tracking features to Admin Utils
 
 - refactor: removed all tracking and logging of events
