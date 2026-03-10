@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
-- feat: new placeholder for chat to discord `**PH_PLAYER_LANGUAGE**`
+- feat: new placeholder for chat to discord `**PH_LANGUAGE**`
 - feat: new placeholder for chat-prefix ingame `**PH_LANGUAGE**`
   - replaced with the players system language
 - feat: new setting `useShutdownNotRestart` executes shutdown not restart if true (default=true)
+- fix: aligned `en` and `ru` translation files with the German source texts
+- feat: added French translation file `fr.properties`
+- build: copy only `README.md` and `HISTORY.md` into `dist`
+- fix: aligned `settings.default.properties` with all active plugin settings and code defaults
 
 
 ## [0.19.0] - 2026-02-05 | Moved tracking features to Admin Utils

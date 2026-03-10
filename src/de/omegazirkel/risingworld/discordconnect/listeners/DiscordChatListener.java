@@ -16,7 +16,6 @@ public class DiscordChatListener implements MessageCreateListener {
     static final PluginSettings s = PluginSettings.getInstance();
     static final I18n t = I18n.getInstance(DiscordConnect.instance.getDescription("name"));
 
-
     static DiscordConnect getPlugin() {
         return DiscordConnect.instance;
     }
@@ -49,8 +48,9 @@ public class DiscordChatListener implements MessageCreateListener {
                 group = " (discord/admin)";
             }
             String displayName = author.getDisplayName();
-            Server.broadcastTextMessage(color + (s.defaultChatPrefix) + displayName + group + ": "
-                    + c.endTag + content);
+            Server.broadcastTextMessage(
+                    color + (s.defaultChatPrefix.replace("**PH_LANGUAGE**", "💻")) + displayName + group + ": "
+                            + c.endTag + content);
         }
 
     }

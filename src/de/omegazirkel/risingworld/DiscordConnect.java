@@ -659,7 +659,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			String message = s.discordChatSyntax
 					.replace("**PH_PLAYER**", username)
 					.replace("**PH_MESSAGE**", text)
-					.replace("**PH_PLAYER_LANG**", language);
+					.replace("**PH_LANGUAGE**", language);
 			sendDiscordMessageToTextChannel(message, s.chatChannelId, image);
 		} else {
 			logger().error("❌ Unable to send chat message: " + text);
@@ -689,7 +689,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			String message = s.discordChatSyntax
 					.replace("**PH_PLAYER**", username)
 					.replace("**PH_MESSAGE**", text)
-					.replace("**PH_PLAYER_LANG**", language);
+					.replace("**PH_LANGUAGE**", language);
 			this.sendDiscordMessageToTextChannel(message, s.supportChannelId, image);
 		} else {
 			logger().error("❌ Unable to send support message: " + text);
