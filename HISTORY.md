@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-03-10
+
 - feat: new placeholder for chat to discord `**PH_LANGUAGE**`
 - feat: new placeholder for chat-prefix ingame `**PH_LANGUAGE**`
   - replaced with the players system language
