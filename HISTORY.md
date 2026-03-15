@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- docs: standardize agent prompts, PR checklist, and runtime smoke-test guidance
+- build: add API verification helper and stricter CI/release validation flow
+
 ## [0.20.0] - 2026-03-10
 
 - feat: new placeholder for chat to discord `**PH_LANGUAGE**`
