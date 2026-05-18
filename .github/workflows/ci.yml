@@ -160,7 +160,7 @@ jobs:
           VERSION="${{ steps.meta.outputs.version }}"
 
           awk -v newver="$VERSION" '
-            /<artifactId>[^<]+<\/artifactId>/ && seen == 0 { print; seen=1; next }
+            /<artifactId>rw-plugin-oz-discord-connect<\/artifactId>/ { print; seen=1; next }
             seen == 1 && /<version>/ { sub(/<version>.*<\/version>/, "<version>" newver "</version>"); seen=0 }
             { print }
           ' pom.xml > pom.xml.tmp && mv pom.xml.tmp pom.xml
