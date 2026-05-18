@@ -8,8 +8,9 @@ import net.risingworld.api.ui.UILabel;
 
 public class DiscordConnectPlayerPluginSettings extends PlayerPluginSettings {
 
-    public DiscordConnectPlayerPluginSettings() {
+    public DiscordConnectPlayerPluginSettings(String pluginVersion) {
         this.pluginLabel = DiscordConnect.name;
+        this.pluginVersion = pluginVersion;
     }
 
     @Override

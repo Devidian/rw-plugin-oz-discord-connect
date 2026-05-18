@@ -41,6 +41,7 @@ import org.json.simple.JSONObject;
 import de.omegazirkel.risingworld.discordconnect.JavaCordBot;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.discordconnect.Utils;
+import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginData;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginSettings;
 import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
@@ -126,7 +127,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		this.initialize();
 
 		// register plugin settings
-		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings());
+		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings(getDescription("version")));
+		PlayerPluginSettingsOverlay.registerPlayerPluginData(new DiscordConnectPlayerPluginData(getDescription("version")));
 		logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 
 	}

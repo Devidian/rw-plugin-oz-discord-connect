@@ -448,7 +448,7 @@ public class DiscordSlashCommandListener implements SlashCommandCreateListener {
     }
 
     private void handleMakeAdminCommand(SlashCommandInteraction interaction) {
-        User discordUser = interaction.getUser();
+        // User discordUser = interaction.getUser();
         Optional<String> playerName = interaction.getArgumentStringValueByName("playername");
 
         if (playerName == null) {

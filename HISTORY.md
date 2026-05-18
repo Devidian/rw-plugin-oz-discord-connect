@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-05-18
+
+- fix: restore colored one-line plugin welcome message
 - build: align bundled PluginAPI jar and Maven dependency version
 - docs: standardize agent prompts, PR checklist, and runtime smoke-test guidance
 - build: add API verification helper and stricter CI/release validation flow
+- build: update OZTools dependency to `0.18.0`
 
 ## [0.20.0] - 2026-03-10
 
