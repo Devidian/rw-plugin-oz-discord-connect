@@ -14,6 +14,9 @@ import java.util.Properties;
 
 import de.omegazirkel.risingworld.DiscordConnect;
 import de.omegazirkel.risingworld.tools.OZLogger;
+import de.omegazirkel.risingworld.tools.settings.AdminSettingsEntry;
+import de.omegazirkel.risingworld.tools.settings.AdminSettingsType;
+import de.omegazirkel.risingworld.tools.settings.SettingsFileEditor;
 
 public class PluginSettings {
 	private static PluginSettings instance = null;
@@ -26,6 +29,7 @@ public class PluginSettings {
 
 	// Settings
 	public String logLevel = "ALL";
+	public boolean reloadOnChange = true;
 	public String joinDiscord = "";
 	public boolean botEnable = false;
 	public boolean sendPluginWelcome = false;
@@ -134,6 +138,7 @@ public class PluginSettings {
 			}
 			// fill global values
 			logLevel = settings.getProperty("logLevel", "ALL");
+			reloadOnChange = settings.getProperty("reloadOnChange", "true").contentEquals("true");
 			postChat = settings.getProperty("postChat", "false").contentEquals("true");
 			joinDiscord = settings.getProperty("joinDiscord", "");
 			overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
@@ -257,5 +262,52 @@ public class PluginSettings {
 			logger().error("URISyntaxException on initSettings: " + ex.getMessage());
 			ex.printStackTrace();
 		}
+	}
+
+	public java.util.List<AdminSettingsEntry> adminSettingsEntries() {
+		return java.util.List.of(
+				entry("logLevel", "Log level", "Controls DiscordConnect logging verbosity.", logLevel, "ALL",
+						AdminSettingsType.STRING),
+				entry("reloadOnChange", "Reload on change",
+						"Documents that DiscordConnect settings reload when settings.properties changes.",
+						reloadOnChange, "true", AdminSettingsType.BOOLEAN),
+				entry("sendPluginWelcome", "Welcome message",
+						"Shows a short DiscordConnect message when a player joins.", sendPluginWelcome, "false",
+						AdminSettingsType.BOOLEAN),
+				entry("botEnable", "Bot enabled", "Enables the Discord bot.", botEnable, "false",
+						AdminSettingsType.BOOLEAN),
+				new AdminSettingsEntry("botToken", "Bot token", "Discord bot token.", "", "", AdminSettingsType.STRING,
+						true, null),
+				entry("botSecure", "Secure bot commands", "Restricts secure bot commands to configured admins.",
+						botSecure, "true", AdminSettingsType.BOOLEAN),
+				entry("postChat", "Post chat", "Forwards ingame chat to Discord.", postChat, "false",
+						AdminSettingsType.BOOLEAN),
+				entry("postSupport", "Post support", "Forwards support messages to Discord.", postSupport, "false",
+						AdminSettingsType.BOOLEAN),
+				entry("reportServerStatus", "Report server status", "Reports server status events to Discord.",
+						reportServerStatus, "true", AdminSettingsType.BOOLEAN),
+				entry("reportSettingsChanged", "Report settings changes", "Reports settings changes to Discord.",
+						reportSettingsChanged, "true", AdminSettingsType.BOOLEAN),
+				entry("allowRestart", "Allow restart", "Enables ingame restart commands.", allowRestart, "false",
+						AdminSettingsType.BOOLEAN),
+				entry("restartTimed", "Scheduled restart", "Enables scheduled restart handling.", restartTimed,
+						"false", AdminSettingsType.BOOLEAN));
+	}
+
+	private AdminSettingsEntry entry(String key, String label, String description, Object value, String defaultValue,
+			AdminSettingsType type) {
+		return new AdminSettingsEntry(
+				key,
+				label,
+				description,
+				String.valueOf(value),
+				defaultValue,
+				type,
+				false,
+				newValue -> SettingsFileEditor.writeValue(settingsPath(), key, newValue));
+	}
+
+	private Path settingsPath() {
+		return Paths.get((plugin.getPath() != null ? plugin.getPath() : ".") + "/settings.properties");
 	}
 }

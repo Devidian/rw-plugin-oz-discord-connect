@@ -47,6 +47,7 @@ import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
+import de.omegazirkel.risingworld.tools.settings.PlayerPluginAdminSettings;
 import de.omegazirkel.risingworld.tools.ui.PlayerPluginSettingsOverlay;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
@@ -129,6 +130,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		// register plugin settings
 		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings(getDescription("version")));
 		PlayerPluginSettingsOverlay.registerPlayerPluginData(new DiscordConnectPlayerPluginData(getDescription("version")));
+		PlayerPluginSettingsOverlay.registerPlayerPluginAdminSettings(
+				new PlayerPluginAdminSettings(name, getDescription("version"), () -> s.adminSettingsEntries(),
+						s::initSettings));
 		logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 
 	}
