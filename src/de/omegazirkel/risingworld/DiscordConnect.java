@@ -38,6 +38,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.user.UserStatus;
 import org.json.simple.JSONObject;
 
+import de.omegazirkel.risingworld.discordconnect.DiscordConnectPluginInfoStatusProvider;
 import de.omegazirkel.risingworld.discordconnect.JavaCordBot;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.discordconnect.Utils;
@@ -49,6 +50,7 @@ import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
 import de.omegazirkel.risingworld.tools.settings.PlayerPluginAdminSettings;
 import de.omegazirkel.risingworld.tools.ui.PlayerPluginSettingsOverlay;
+import de.omegazirkel.risingworld.tools.ui.PluginInfoStatusProviders;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
 import net.risingworld.api.events.EventMethod;
@@ -133,6 +135,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		PlayerPluginSettingsOverlay.registerPlayerPluginAdminSettings(
 				new PlayerPluginAdminSettings(name, getDescription("version"), () -> s.adminSettingsEntries(),
 						s::initSettings));
+		PluginInfoStatusProviders
+				.registerProvider(new DiscordConnectPluginInfoStatusProvider(this, getDescription("version")));
 		logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 
 	}
@@ -188,6 +192,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	@Override
 	public void onDisable() {
 		logger().warn("⚠️ Disabling " + this.getName() + " ...");
+		if (name != null) {
+			PluginInfoStatusProviders.unregisterProvider(name);
+		}
 		this.statusNotification("TC_STATUS_DISABLED");
 		if (s.botEnable) {
 			JavaCordBot.disconnect();
@@ -242,10 +249,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					}
 					break;
 				case "info":
-					String infoMessage = t.get("TC_CMD_INFO", lang)
-							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
-							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text);
-					player.sendTextMessage(c.okay + this.getName() + ":> " + c.text + infoMessage);
+					PluginInfoStatusProviders.show(player, name);
 					break;
 				case "help":
 					String helpMessage = t.get("TC_CMD_HELP", lang)
@@ -258,14 +262,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					player.sendTextMessage(c.okay + this.getName() + ":> " + c.text + helpMessage);
 					break;
 				case "status":
-					String statusMessage = t.get("TC_CMD_STATUS", lang)
-							.replace("PH_VERSION", c.okay + this.getDescription("version") + c.text)
-							.replace("PH_LANGUAGE",
-									s.colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage()
-											+ c.text)
-							.replace("PH_USEDLANG", s.colorLocalOther + t.getLanguageUsed(lang) + c.text)
-							.replace("PH_LANG_AVAILABLE", c.okay + t.getLanguageAvailable() + c.text);
-					player.sendTextMessage(c.okay + this.getName() + ":> " + c.text + statusMessage);
+					PluginInfoStatusProviders.show(player, name);
 					break;
 				default:
 					break;
@@ -898,9 +895,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 		s.initSettings(settingsPath.toString());
 		this.initialize();
-		// set logger level
-		Utils.logger().setLevel(s.logLevel);
-		JavaCordBot.logger().setLevel(s.logLevel);
 		logger().setLevel(s.logLevel);
 	}
 

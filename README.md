@@ -29,9 +29,9 @@
 | /support [text] | sends [text] as support message to Discord                     |
 | /dc restart     | set restart flag to shutdown server after last player has left |
 | /joinDiscord    | join the servers Discord server                                |
-| /dc info        | Show plugin description                                        |
+| /dc info        | Open the shared Tools Info/Status panel                        |
 | /dc help        | Show plugin commands                                           |
-| /dc status      | Show current plugin status (version, connection, language,...) |
+| /dc status      | Open the shared Tools Info/Status panel                        |
 
 ## Commands discord
 

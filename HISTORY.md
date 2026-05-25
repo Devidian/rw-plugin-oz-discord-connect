@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- feat: add shared Tools Info/Status panel content for Discord Connect and route `/dc info` plus `/dc status` to it
+- feat: complete grouped admin settings metadata and i18n labels for Discord Connect settings
+- refactor: keep Discord Connect settings reload logging on the main `OZ.DiscordConnect` logger only
+
 ## [0.20.1] - 2026-05-18
 
 - fix: restore colored one-line plugin welcome message
