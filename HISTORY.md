@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-05-26 | Shared plugin menu and status panel
+
 - change: use the dedicated Discord Connect icon in the shared Tools plugin menu
 - feat: add Discord Connect radial Info/Status entry using the shared Tools info icon
 - feat: add shared Tools Info/Status panel content for Discord Connect and route `/dc info` plus `/dc status` to it
