@@ -27,6 +27,7 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
     public String getInfo(Player player) {
         return t().get("TC_DISCORD_CONNECT_INFO_PANEL_INFO", player)
                 .replace("PH_PLUGIN_NAME", pluginName)
+                .replace("PH_VERSION", version)
                 .replace("PH_PLUGIN_CMD", "dc");
     }
 
@@ -34,7 +35,6 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
     public String getStatus(Player player) {
         PluginSettings settings = PluginSettings.getInstance();
         return t().get("TC_DISCORD_CONNECT_INFO_PANEL_STATUS", player)
-                .replace("PH_VERSION", version)
                 .replace("PH_BOT_ENABLED", String.valueOf(settings.botEnable))
                 .replace("PH_POST_CHAT", String.valueOf(settings.postChat))
                 .replace("PH_POST_SUPPORT", String.valueOf(settings.postSupport))
@@ -46,10 +46,7 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
                 .replace("PH_JOIN_DISCORD", String.valueOf(settings.joinDiscord != null && !settings.joinDiscord.isBlank()))
                 .replace("PH_LANGUAGE", player.getLanguage() + " / " + player.getSystemLanguage())
                 .replace("PH_USEDLANG", t().getLanguageUsed(player.getSystemLanguage()))
-                .replace("PH_LANG_AVAILABLE", t().getLanguageAvailable())
-                .replace("PH_LOG_LEVEL", settings.logLevel)
-                .replace("PH_RELOAD_ON_CHANGE", String.valueOf(settings.reloadOnChange))
-                .replace("PH_WELCOME_MESSAGE", String.valueOf(settings.sendPluginWelcome));
+                .replace("PH_LANG_AVAILABLE", t().getLanguageAvailable());
     }
 
     private I18n t() {

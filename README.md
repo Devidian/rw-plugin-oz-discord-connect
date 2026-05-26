@@ -33,6 +33,8 @@
 | /dc help        | Show plugin commands                                           |
 | /dc status      | Open the shared Tools Info/Status panel                        |
 
+The plugin radial menu entry opens the same shared Tools Info/Status panel using the portfolio-wide Info/Status icon.
+
 ## Commands discord
 
 | Command                                 | Description                                                    |

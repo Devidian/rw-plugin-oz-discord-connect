@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- change: use the dedicated Discord Connect icon in the shared Tools plugin menu
+- feat: add Discord Connect radial Info/Status entry using the shared Tools info icon
 - feat: add shared Tools Info/Status panel content for Discord Connect and route `/dc info` plus `/dc status` to it
 - feat: complete grouped admin settings metadata and i18n labels for Discord Connect settings
 - refactor: keep Discord Connect settings reload logging on the main `OZ.DiscordConnect` logger only
