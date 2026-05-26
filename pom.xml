@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.18.0</version>
+            <version>0.19.0</version>
             <scope>provided</scope>
         </dependency>
 
