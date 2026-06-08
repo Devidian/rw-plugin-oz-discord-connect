@@ -20,9 +20,14 @@ Supporting repositories:
 - Event channel ids should be separate by event category so admins can choose which events are sent.
 
 ## Work Packages
-- [ ] Package 1: Adopt shared settings reload/admin settings tab metadata if the portfolio-wide prework is applied to all plugins.
-- [ ] Package 2: Review optional notification requests only when a feature plugin explicitly needs Discord delivery.
-- [ ] Package 3: Preserve the public API surface for sibling plugins that post status or event messages.
+- [x] Package 1: Adopt shared settings reload/admin settings tab metadata if the portfolio-wide prework is applied to all plugins.
+- [x] Package 2: Review optional notification requests only when a feature plugin explicitly needs Discord delivery.
+- [x] Package 3: Preserve the public API surface for sibling plugins that post status or event messages.
+
+## Completion Notes
+- Discord Connect adopted shared admin settings and current Tools runtime standards.
+- Optional producer notifications remain feature-owned and are only added when an explicit producer package requires them.
+- Cross-plugin validation preserved the existing sibling-plugin Discord API surface.
 
 ## Risks
 - Discord Connect must not absorb Shop, Marketplace, prison, claim, or GPS business logic.

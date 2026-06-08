@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-06-08 | Chat shortcut parsing
+
+- fix: parse `+s`, `+sng`, and `+t` chat shortcuts at end-of-message or before whitespace
+- feat: add Discord Connect player shortcut visibility setting
+
 ## [0.21.0] - 2026-05-26 | Shared plugin menu and status panel
 
 - change: use the dedicated Discord Connect icon in the shared Tools plugin menu

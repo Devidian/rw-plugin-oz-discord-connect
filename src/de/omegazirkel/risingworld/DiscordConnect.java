@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.Timer;
@@ -38,6 +40,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.user.UserStatus;
 import org.json.simple.JSONObject;
 
+import de.omegazirkel.risingworld.discordconnect.ChatShortcutParser;
 import de.omegazirkel.risingworld.discordconnect.DiscordConnectPluginInfoStatusProvider;
 import de.omegazirkel.risingworld.discordconnect.JavaCordBot;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
@@ -48,12 +51,15 @@ import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
+import de.omegazirkel.risingworld.tools.PlayerSettings;
+import de.omegazirkel.risingworld.tools.db.SQLiteConnectionFactory;
 import de.omegazirkel.risingworld.tools.settings.PlayerPluginAdminSettings;
 import de.omegazirkel.risingworld.tools.ui.AssetManager;
 import de.omegazirkel.risingworld.tools.ui.MenuItem;
 import de.omegazirkel.risingworld.tools.ui.PlayerPluginSettingsOverlay;
 import de.omegazirkel.risingworld.tools.ui.PluginInfoStatusProviders;
 import de.omegazirkel.risingworld.tools.ui.PluginMenuManager;
+import de.omegazirkel.risingworld.tools.ui.PluginShortcutVisibility;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
 import net.risingworld.api.events.EventMethod;
@@ -81,6 +87,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	private static PluginSettings s = null;
 	static JavaCordBot DiscordBot = null;
 	public static String name;
+	public static Connection sqliteCon;
+	public static PlayerSettings playerSettings;
 
 	public static DiscordConnect instance = null;
 
@@ -124,6 +132,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		registerEventListener(this);
 		t = I18n.getInstance(this);
 		s = PluginSettings.getInstance(this);
+		sqliteCon = SQLiteConnectionFactory.open(this);
+		playerSettings = new PlayerSettings(sqliteCon);
 		// lookup connected plugins
 		pluginGlobalIntercom = getPluginByName("OZ - Global Intercom");
 		if (pluginGlobalIntercom != null) {
@@ -141,7 +151,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						s::initSettings));
 			PluginInfoStatusProviders
 					.registerProvider(new DiscordConnectPluginInfoStatusProvider(this, getDescription("version")));
-			PluginMenuManager.registerPluginMenu(new MenuItem(AssetManager.getIcon("icon-ki-discord-connect"),
+			PluginShortcutVisibility.register(name, DiscordConnectPlayerPluginSettings::shortcutVisible);
+			PluginMenuManager.registerPluginMenu(new MenuItem(name, AssetManager.getIcon("icon-ki-discord-connect"),
 					"Discord Connect", player -> {
 						player.hideRadialMenu(true);
 						PluginInfoStatusProviders.show(player, name);
@@ -202,6 +213,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public void onDisable() {
 		logger().warn("⚠️ Disabling " + this.getName() + " ...");
 		if (name != null) {
+			PluginShortcutVisibility.unregister(name);
 			PluginInfoStatusProviders.unregisterProvider(name);
 		}
 		this.statusNotification("TC_STATUS_DISABLED");
@@ -218,6 +230,13 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 		if (activityTask != null) {
 			activityTask.cancel();
+		}
+		if (sqliteCon != null) {
+			try {
+				sqliteCon.close();
+			} catch (SQLException ex) {
+				logger().warn("Failed to close Discord Connect database connection: " + ex.getMessage());
+			}
 		}
 		logger().warn("❌ " + this.getName() + " disabled.");
 	}
@@ -359,14 +378,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 		if (processMessage && noColorText.trim().length() > 0) {
 			Player player = event.getPlayer();
+			String teleportCommand = "`goto " + player.getPosition().toString().replaceAll("[,()]", "") + "`";
+			ChatShortcutParser.Result shortcuts = ChatShortcutParser.parse(noColorText, teleportCommand);
+			noColorText = shortcuts.message();
 			// check for teleport shortcut
-			noColorText = noColorText.replace("+tp ",
-					"`goto " + player.getPosition().toString().replaceAll("[,()]", "") + "`");
 
 			// check for screenshot shortcut
-			Boolean screenshotWithGui = noColorText.contains("+screen") || noColorText.contains("+s ");
-			Boolean screenshotWithoutGui = noColorText.contains("+screennogui") || noColorText.contains("+sng ");
-			Boolean hasScreenshot = screenshotWithGui || screenshotWithoutGui;
+			Boolean screenshotWithoutGui = shortcuts.screenshotWithoutGui();
+			Boolean hasScreenshot = shortcuts.hasScreenshot();
 
 			if (s.allowScreenshots == true && hasScreenshot == true) {
 				int playerResolutionX = player.getScreenResolutionX();
@@ -374,11 +393,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				if (playerResolutionX > s.maxScreenWidth) {
 					sizeFactor = (s.maxScreenWidth * 1f / playerResolutionX * 1f);
 				}
-				final String textToSend = noColorText = noColorText
-						.replace("+screennogui", "🖼️")
-						.replace("+screen", "🖼️")
-						.replace("+sng ", "🖼️ ")
-						.replace("+s ", "🖼️ ");
+				final String textToSend = noColorText;
 				logger().debug("Taking screenshot with factor " + sizeFactor);
 				player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();

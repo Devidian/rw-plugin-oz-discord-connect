@@ -12,8 +12,9 @@
 - plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
 - players can type /joinDiscord to join your discord if you configure this
 - support messages now have a screenshot attached
-- normal chat messages wich contain `+screen` or `+s ` (include space) have a screenshot uploaded to discord
-- normal chat messages wich contain `+screennogui` or `+sng ` (include space) have a screenshot without interface
+- normal chat messages which contain `+screen` or `+s` as a token have a screenshot uploaded to discord
+- normal chat messages which contain `+screennogui` or `+sng` as a token have a screenshot without interface
+- normal chat messages which contain `+tp` or `+t` as a token include the player's current coordinates
 - Public API for other plugins (status/event channel)
 - Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
 - Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts

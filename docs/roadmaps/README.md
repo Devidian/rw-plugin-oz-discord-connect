@@ -4,6 +4,7 @@ Large implementation plans and long-lived roadmap documents live here.
 
 ## Current Roadmaps
 
+- [Roadmap Plan 04 Chat Shortcut Parsing](roadmap-plan-04-chat-shortcut-parsing.md)
 - [Roadmap Plan 03 Menu Info Button](roadmap-plan-03-menu-info-button.md)
 - [Roadmap Plan 02 Plugin Standardization](roadmap-plan-02-plugin-standardization.md)
 - [Roadmap Plan 01 Compatibility](roadmap-plan-01-compatibility.md)

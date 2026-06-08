@@ -8,7 +8,7 @@
 
     <groupId>com.github.devidian</groupId>
     <artifactId>rw-plugin-oz-discord-connect</artifactId>
-    <version>0.21.0</version>
+    <version>0.22.0</version>
 
     <name>OZDiscordConnect</name>
     <description>Rising World Discord-Connect Plugin by OmegaZirkel.de</description>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-global-intercom</artifactId>
-            <version>0.13.0</version>
+            <version>0.15.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.20.0</version>
+            <version>0.21.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -95,10 +95,18 @@
             <version>0.9.2</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>src-test</testSourceDirectory>
         <directory>target</directory>
         <finalName>${project.name}</finalName>
 
@@ -200,7 +208,7 @@
                         <configuration>
                             <outputDirectory>${basedir}/dist/${project.name}/lib</outputDirectory>
                             <excludeTypes>pom</excludeTypes>
-                            <excludeScope>provided</excludeScope>
+                            <includeScope>runtime</includeScope>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <!-- <excludeTransitive>true</excludeTransitive> -->
                         </configuration>
