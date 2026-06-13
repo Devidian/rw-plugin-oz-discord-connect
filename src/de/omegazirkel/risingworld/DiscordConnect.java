@@ -17,11 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -52,6 +56,7 @@ import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
 import de.omegazirkel.risingworld.tools.PlayerSettings;
+import de.omegazirkel.risingworld.tools.ServerThreadDispatcher;
 import de.omegazirkel.risingworld.tools.db.SQLiteConnectionFactory;
 import de.omegazirkel.risingworld.tools.settings.PlayerPluginAdminSettings;
 import de.omegazirkel.risingworld.tools.ui.AssetManager;
@@ -89,6 +94,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public static String name;
 	public static Connection sqliteCon;
 	public static PlayerSettings playerSettings;
+	private ServerThreadDispatcher serverThreadDispatcher;
+	private ThreadPoolExecutor discordTransportExecutor;
 
 	public static DiscordConnect instance = null;
 
@@ -128,6 +135,19 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public void onEnable() {
 		name = this.getDescription("name");
 		DiscordConnect.instance = this; // for timer
+		serverThreadDispatcher = new ServerThreadDispatcher(this);
+		discordTransportExecutor = new ThreadPoolExecutor(
+				1,
+				1,
+				0L,
+				TimeUnit.MILLISECONDS,
+				new ArrayBlockingQueue<>(256),
+				task -> {
+					Thread thread = new Thread(task, "OZDiscordConnect-Transport");
+					thread.setDaemon(true);
+					return thread;
+				},
+				(task, executor) -> logger().warn("Discord transport queue is full or shutting down; message dropped"));
 		// Register event listener
 		registerEventListener(this);
 		t = I18n.getInstance(this);
@@ -189,6 +209,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		activityTask = new TimerTask() {
 			@Override
 			public void run() {
+				dispatchServer(DiscordConnect.this::updateDiscordActivity);
+			}
+		};
+		activityTimer.schedule(activityTask, 0, 10000); // Check every 10 seconds
+		this.statusNotification("TC_STATUS_ENABLED");
+	}
+
+	private void updateDiscordActivity() {
 				if (s.botEnable && JavaCordBot.api != null && JavaCordBot.api.getStatus() == UserStatus.ONLINE) {
 					String currentActivity = "Running, " + Server.getPlayerCount() + " of " + Server.getMaxPlayerCount()
 							+ " players";
@@ -200,10 +228,6 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						logger().debug("Updated Discord activity to: " + currentActivity);
 					}
 				}
-			}
-		};
-		activityTimer.schedule(activityTask, 0, 10000); // Check every 10 seconds
-		this.statusNotification("TC_STATUS_ENABLED");
 	}
 
 	/**
@@ -212,11 +236,15 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	@Override
 	public void onDisable() {
 		logger().warn("⚠️ Disabling " + this.getName() + " ...");
+		if (serverThreadDispatcher != null) {
+			serverThreadDispatcher.close();
+		}
 		if (name != null) {
 			PluginShortcutVisibility.unregister(name);
 			PluginInfoStatusProviders.unregisterProvider(name);
 		}
 		this.statusNotification("TC_STATUS_DISABLED");
+		shutdownDiscordTransport();
 		if (s.botEnable) {
 			JavaCordBot.disconnect();
 			DiscordBot = null;
@@ -321,15 +349,21 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						sizeFactor = (s.maxScreenWidth * 1f / playerResolutionX * 1f);
 					}
 					logger().debug("Taking screenshot with factor " + sizeFactor);
-
+					final int playerDbId = player.getDbID();
+					final String playerLanguage = player.getSystemLanguage();
 					player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
 						final ByteArrayOutputStream os = new ByteArrayOutputStream();
 						try {
 							ImageIO.write(bimg, "jpg", os);
 							this.sendDiscordSupportMessage("SupportTicket", supportMessage, os.toByteArray(),
-									player.getSystemLanguage());
-							player.sendTextMessage(
-									c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
+									playerLanguage);
+							dispatchServer(() -> {
+								Player onlinePlayer = Server.getPlayerByDbID(playerDbId);
+								if (onlinePlayer != null) {
+									onlinePlayer.sendTextMessage(
+											c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
+								}
+							});
 						} catch (Exception e) {
 							// throw new UncheckedIOException(ioe);
 							logger().error(e.toString());
@@ -394,13 +428,14 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					sizeFactor = (s.maxScreenWidth * 1f / playerResolutionX * 1f);
 				}
 				final String textToSend = noColorText;
+				final String playerName = player.getName();
+				final String playerLanguage = player.getSystemLanguage();
 				logger().debug("Taking screenshot with factor " + sizeFactor);
 				player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					try {
 						ImageIO.write(bimg, "jpg", os);
-						this.sendDiscordChatMessage(player.getName(), textToSend, os.toByteArray(),
-								player.getSystemLanguage());
+						this.sendDiscordChatMessage(playerName, textToSend, os.toByteArray(), playerLanguage);
 					} catch (Exception e) {
 						// throw new UncheckedIOException(ioe);
 						logger().error(e.toString());
@@ -498,6 +533,11 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	public void sendDiscordMessageToTextChannel(String message, long channelId, byte[] image) {
+		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
+		submitDiscordTransport(() -> sendDiscordMessageToTextChannelNow(message, channelId, imageCopy));
+	}
+
+	private void sendDiscordMessageToTextChannelNow(String message, long channelId, byte[] image) {
 		if (channelId == 0) {
 			logger().warn("⚠️ channelId = 0, set channelId in plugin settings or deactivate this channel");
 			return;
@@ -531,6 +571,11 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	private void sendDiscordMessageToWebHook(String username, String text, URI channel, byte[] image) {
+		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
+		submitDiscordTransport(() -> sendDiscordMessageToWebHookNow(username, text, channel, imageCopy));
+	}
+
+	private void sendDiscordMessageToWebHookNow(String username, String text, URI channel, byte[] image) {
 		if (channel == null || channel.toString() == "") {
 			logger().error("⚠️ Cant send message to webhook <channel:" +
 					channel + "> <text:" + text + "> <username:" + username + ">");
@@ -661,6 +706,38 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		} catch (Exception ex) {
 			logger().error("Error initializing async client: " + ex.getMessage());
 			ex.printStackTrace();
+		}
+	}
+
+	private void submitDiscordTransport(Runnable task) {
+		ThreadPoolExecutor executor = discordTransportExecutor;
+		if (executor == null || executor.isShutdown()) {
+			logger().warn("Discord transport is unavailable; message dropped");
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				task.run();
+			} catch (RuntimeException ex) {
+				logger().error("Discord transport failed: " + ex.getMessage());
+			}
+		});
+	}
+
+	private void shutdownDiscordTransport() {
+		ThreadPoolExecutor executor = discordTransportExecutor;
+		discordTransportExecutor = null;
+		if (executor == null) {
+			return;
+		}
+		executor.shutdown();
+		try {
+			if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+				executor.shutdownNow();
+			}
+		} catch (InterruptedException ex) {
+			executor.shutdownNow();
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -815,6 +892,40 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			restartTask = new TimerTask() {
 				@Override
 				public void run() {
+					dispatchServer(DiscordConnect.this::handleScheduledRestart);
+				}
+			};
+
+			restartTimer.schedule(restartTask, cal.getTime());
+
+			// force restarting
+			if (s.forceRestartAfter > 0) {
+				if (restartForcedTask != null) {
+					restartForcedTask.cancel();
+				}
+
+				restartForcedTask = new TimerTask() {
+					@Override
+					public void run() {
+						dispatchServer(DiscordConnect.this::handleForcedRestart);
+					}
+				};
+
+				cal.set(MINUTE, nextMinute + s.forceRestartAfter);
+				restartTimer.schedule(restartForcedTask, cal.getTime());
+			}
+
+			// clear canceled tasks;
+			restartTimer.purge();
+			activityTimer.purge();
+
+		} catch (Exception e) {
+			logger().fatal(e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void handleScheduledRestart() {
 					int playerNum = Server.getPlayerCount();
 					if (playerNum > 0) {
 						logger().info("Setting restart flag for scheduled server-restart");
@@ -832,40 +943,18 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 
 						restart();
 					}
-				}
-			};
+	}
 
-			restartTimer.schedule(restartTask, cal.getTime());
-
-			// force restarting
-			if (s.forceRestartAfter > 0) {
-				if (restartForcedTask != null) {
-					restartForcedTask.cancel();
-				}
-
-				restartForcedTask = new TimerTask() {
-					@Override
-					public void run() {
+	private void handleForcedRestart() {
 						logger().warn("Force server restart now!");
 						for (Player player : Server.getAllPlayers()) {
 							player.kick("Server restart");
 						}
 						forceRestart();
-					}
-				};
+	}
 
-				cal.set(MINUTE, nextMinute + s.forceRestartAfter);
-				restartTimer.schedule(restartForcedTask, cal.getTime());
-			}
-
-			// clear canceled tasks;
-			restartTimer.purge();
-			activityTimer.purge();
-
-		} catch (Exception e) {
-			logger().fatal(e.getLocalizedMessage());
-			e.printStackTrace();
-		}
+	public boolean dispatchServer(Runnable task) {
+		return serverThreadDispatcher != null && serverThreadDispatcher.dispatch(task);
 	}
 
 	/**

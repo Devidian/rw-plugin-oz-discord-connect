@@ -25,6 +25,13 @@ public class DiscordChatListener implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
+        DiscordConnect plugin = getPlugin();
+        if (plugin != null) {
+            plugin.dispatchServer(() -> handleMessageCreate(event));
+        }
+    }
+
+    private void handleMessageCreate(MessageCreateEvent event) {
 
         DiscordConnect.logger().debug("messageCreateEvent");
         String content = event.getMessageContent();

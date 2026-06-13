@@ -1,6 +1,11 @@
 # History
 
-## [Unreleased]
+## [0.22.1] - 2026-06-13 | Callback thread safety
+
+- fix: dispatch JavaCord listeners, restart timers, activity updates, and screenshot notifications onto the server thread
+- fix: avoid retaining `Player` objects in asynchronous screenshot callbacks
+- fix: avoid blocking the server thread while waiting for Discord slash-command responses
+- fix: move webhook and text-channel transport onto a bounded lifecycle-owned worker
 
 ## [0.22.0] - 2026-06-08 | Chat shortcut parsing
 
