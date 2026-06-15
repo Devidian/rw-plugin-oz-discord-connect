@@ -1,5 +1,10 @@
 # History
 
+## [0.22.2] - 2026-06-14 | Timer lifecycle
+
+- fix: bind restart and activity timers to plugin enable/disable lifecycle
+- feat: log Discord transport worker lifecycle through Tools diagnostics
+
 ## [0.22.1] - 2026-06-13 | Callback thread safety
 
 - fix: dispatch JavaCord listeners, restart timers, activity updates, and screenshot notifications onto the server thread

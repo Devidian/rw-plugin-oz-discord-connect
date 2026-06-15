@@ -52,6 +52,7 @@ import de.omegazirkel.risingworld.discordconnect.Utils;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginData;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginSettings;
 import de.omegazirkel.risingworld.tools.Colors;
+import de.omegazirkel.risingworld.tools.DiagnosticThreadFactory;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.OZLogger;
@@ -104,11 +105,11 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	static Plugin pluginGlobalIntercom = null;
 
 	// Timer
-	static Timer restartTimer = new Timer("OZDiscordConnect-RestartTimer", true);
-	static Timer activityTimer = new Timer("OZDiscordConnect-ActivityTimer", true);
-	static TimerTask restartTask = null;
-	static TimerTask restartForcedTask = null;
-	static TimerTask activityTask = null;
+	Timer restartTimer;
+	Timer activityTimer;
+	TimerTask restartTask;
+	TimerTask restartForcedTask;
+	TimerTask activityTask;
 	static String lastActivity = "";
 
 	public void setFlagRestart(boolean value) {
@@ -135,6 +136,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public void onEnable() {
 		name = this.getDescription("name");
 		DiscordConnect.instance = this; // for timer
+		initializeTimers();
 		serverThreadDispatcher = new ServerThreadDispatcher(this);
 		discordTransportExecutor = new ThreadPoolExecutor(
 				1,
@@ -142,11 +144,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				0L,
 				TimeUnit.MILLISECONDS,
 				new ArrayBlockingQueue<>(256),
-				task -> {
-					Thread thread = new Thread(task, "OZDiscordConnect-Transport");
-					thread.setDaemon(true);
-					return thread;
-				},
+				new DiagnosticThreadFactory("OZDiscordConnect", "Discord transport", "OZDiscordConnect-Transport",
+						true, logger()::debug),
 				(task, executor) -> logger().warn("Discord transport queue is full or shutting down; message dropped"));
 		// Register event listener
 		registerEventListener(this);
@@ -239,6 +238,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		if (serverThreadDispatcher != null) {
 			serverThreadDispatcher.close();
 		}
+		shutdownTimers();
 		if (name != null) {
 			PluginShortcutVisibility.unregister(name);
 			PluginInfoStatusProviders.unregisterProvider(name);
@@ -249,22 +249,49 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			JavaCordBot.disconnect();
 			DiscordBot = null;
 		}
-		// Timer-Tasks und Timer abbrechen und zurücksetzen
+		closeDatabase();
+		DiscordConnect.instance = null;
+	}
+
+	void initializeTimers() {
+		shutdownTimers();
+		restartTimer = new Timer("OZDiscordConnect-RestartTimer", true);
+		activityTimer = new Timer("OZDiscordConnect-ActivityTimer", true);
+	}
+
+	void shutdownTimers() {
 		if (restartTask != null) {
 			restartTask.cancel();
+			restartTask = null;
 		}
 		if (restartForcedTask != null) {
 			restartForcedTask.cancel();
+			restartForcedTask = null;
 		}
 		if (activityTask != null) {
 			activityTask.cancel();
+			activityTask = null;
 		}
+		if (restartTimer != null) {
+			restartTimer.cancel();
+			restartTimer.purge();
+			restartTimer = null;
+		}
+		if (activityTimer != null) {
+			activityTimer.cancel();
+			activityTimer.purge();
+			activityTimer = null;
+		}
+	}
+
+	private void closeDatabase() {
 		if (sqliteCon != null) {
 			try {
 				sqliteCon.close();
 			} catch (SQLException ex) {
 				logger().warn("Failed to close Discord Connect database connection: " + ex.getMessage());
 			}
+			sqliteCon = null;
 		}
 		logger().warn("❌ " + this.getName() + " disabled.");
 	}
