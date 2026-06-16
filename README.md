@@ -19,6 +19,10 @@
 - Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
 - Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts
 
+The bot uses JDA 6.4.2. Enable the privileged `MESSAGE_CONTENT` intent in the
+Discord Developer Portal. Slash commands are registered per guild. Webhooks
+continue to work when `botEnable=false`.
+
 ## Planned features
 
 - currently none
@@ -113,13 +117,13 @@ The settings.properties contains all you need to configure this plugin
 | logLevel                    | 0               | Logging to server console higher values means less output 0=all (debug)                                            |
 | restartOnUpdate             | false           | if true, restart flag is set automatically if plugin file has changed on the server                                |
 | sendPluginWelcome           | false           | -                                                                                                                  |
-| **JavaCord settings**       |                 |                                                                                                                    |
+| **JDA bot settings**        |                 |                                                                                                                    |
 | botEnable                   | false           | Enables usage of DiscordBot                                                                                        |
 | botSecure                   | true            | Only Bot owner can use commands if `true`                                                                          |
 | botToken                    |                 | the token for your bot                                                                                             |
 | botLang                     | en              | -                                                                                                                  |
 | botChatChannelName          | server-chat     | -                                                                                                                  |
-| botAdmins                   |                 | -                                                                                                                  |
+| botAdmins                   |                 | comma-separated exact Discord user snowflake IDs; names and partial IDs are rejected                              |
 | **other plugin settings**   |                 |                                                                                                                    |
 | allowRestart                | false           | if true, normal players are allowed to use /ozrestart after they played `restartMinimumTime` seconds on the server |
 | restartMinimumTime          | 86400           | player must play at least this time in seconds to use restart feature                                              |

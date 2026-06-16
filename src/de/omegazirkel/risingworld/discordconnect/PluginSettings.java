@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.omegazirkel.risingworld.DiscordConnect;
 import de.omegazirkel.risingworld.tools.OZLogger;
@@ -35,6 +37,7 @@ public class PluginSettings {
 	public boolean sendPluginWelcome = false;
 	public String botToken = "";
 	public String botAdmins = "";
+	public Set<String> botAdminIds = Set.of();
 	public String botLang = "en";
 
 	// Discord chat settings
@@ -160,6 +163,8 @@ public class PluginSettings {
 			botToken = settings.getProperty("botToken", "");
 			botLang = settings.getProperty("botLang", "en");
 			botAdmins = settings.getProperty("botAdmins", "");
+			botAdminIds = parseDiscordSnowflakeIds(botAdmins);
+			discordCommands.clear();
 
 			// discord bot commands
 			// simple commands with no options
@@ -261,6 +266,22 @@ public class PluginSettings {
 			logger().error("URISyntaxException on initSettings: " + ex.getMessage());
 			ex.printStackTrace();
 		}
+	}
+
+	static Set<String> parseDiscordSnowflakeIds(String configuredIds) {
+		if (configuredIds == null || configuredIds.isBlank()) {
+			return Set.of();
+		}
+		return java.util.Arrays.stream(configuredIds.split(","))
+				.map(String::trim)
+				.filter(value -> {
+					boolean valid = value.matches("[1-9][0-9]{16,19}");
+					if (!valid && !value.isEmpty()) {
+						logger().warn("Ignoring invalid botAdmins Discord ID: " + value);
+					}
+					return valid;
+				})
+				.collect(Collectors.toUnmodifiableSet());
 	}
 
 	public java.util.List<AdminSettingsEntry> adminSettingsEntries() {

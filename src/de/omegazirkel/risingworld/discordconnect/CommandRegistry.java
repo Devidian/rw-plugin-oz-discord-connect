@@ -1,122 +1,74 @@
 package de.omegazirkel.risingworld.discordconnect;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.interaction.ApplicationCommandBuilder;
-import org.javacord.api.interaction.SlashCommandBuilder;
-import org.javacord.api.interaction.SlashCommandOption;
-import org.javacord.api.interaction.SlashCommandOptionType;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-public class CommandRegistry {
-
-    public static void syncCommandsForAllServers(DiscordApi api) {
-        List<CmdDef> commands = getRequiredCommands();
-        api.getServers().forEach(server -> syncCommandsForServer(api, server, commands));
-    }
-
-    /**
-     * syncronize commands for all servers the api is connected to
-     */
-    public static void syncCommandsForAllServers(DiscordApi api, List<CmdDef> commands) {
-        api.getServers().forEach(server -> syncCommandsForServer(api, server, commands));
+public final class CommandRegistry {
+    private CommandRegistry() {
     }
 
     public static List<CmdDef> getRequiredCommands() {
-
-        SlashCommandOption playerIdOption = SlashCommandOption.create(
-                SlashCommandOptionType.STRING,
-                "playerid64",
-                "Steam64 ID of the player",
-                false);
-
-        SlashCommandOption playerNameOption = SlashCommandOption.create(
-                SlashCommandOptionType.STRING,
-                "playername",
-                "Name of the player",
-                false);
-        SlashCommandOption playerBNameOption = SlashCommandOption.create(
-                SlashCommandOptionType.STRING,
-                "targetPlayerName",
-                "Name of the target player",
-                false);
-        SlashCommandOption durationInSec = SlashCommandOption.create(SlashCommandOptionType.LONG, "duration",
-                "The duration in seconds");
-        SlashCommandOption intValueOption = SlashCommandOption.create(SlashCommandOptionType.LONG, "intValue",
-                "The value to set to");
-        SlashCommandOption hourOption = SlashCommandOption.create(SlashCommandOptionType.LONG, "hourValue",
-                "The hour value to set to");
-        SlashCommandOption minuteOption = SlashCommandOption.create(SlashCommandOptionType.LONG, "minuteValue",
-                "The minute value to set to");
-        SlashCommandOption reasonOption = SlashCommandOption.create(SlashCommandOptionType.STRING, "reason",
-                "The reason for the ban/kick");
-        SlashCommandOption textOption = SlashCommandOption.create(SlashCommandOptionType.STRING, "text", "Text input");
-        SlashCommandOption groupOption = SlashCommandOption.create(SlashCommandOptionType.STRING, "groupName",
-                "Group name");
-        SlashCommandOption weatherOption = SlashCommandOption.create(SlashCommandOptionType.STRING, "weatherName",
-                "Weather name");
-        SlashCommandOption channelOption = SlashCommandOption.create(SlashCommandOptionType.STRING, "channel",
-                "Channel to send the message to default: local");
+        OptionData playerId = option(OptionType.STRING, "playerid64", "Steam64 ID of the player", false);
+        OptionData player = option(OptionType.STRING, "playername", "Name of the player", false);
+        OptionData target = option(OptionType.STRING, "targetplayername", "Name of the target player", false);
+        OptionData duration = option(OptionType.INTEGER, "duration", "Duration in seconds", false);
+        OptionData value = option(OptionType.INTEGER, "intvalue", "Value to set", false);
+        OptionData hour = option(OptionType.INTEGER, "hourvalue", "Hour to set", false);
+        OptionData minute = option(OptionType.INTEGER, "minutevalue", "Minute to set", false);
+        OptionData reason = option(OptionType.STRING, "reason", "Reason", false);
+        OptionData text = option(OptionType.STRING, "text", "Text input", false);
+        OptionData group = option(OptionType.STRING, "groupname", "Group name", false);
+        OptionData weather = option(OptionType.STRING, "weathername", "Weather name", false);
+        OptionData channel = option(OptionType.STRING, "channel", "Message channel, default local", false);
         return List.of(
-                new CmdDef("getversion", "Show the current DiscordConnect version", List.of()),
-                new CmdDef("ban", "Ban a player",
-                        List.of(playerIdOption, playerNameOption, durationInSec, reasonOption)),
-                new CmdDef("restart", "Trigger server restart", List.of()),
-                new CmdDef("reloadplugins", "Trigger plugin reload", List.of()),
-                new CmdDef("unban", "Remove a player from ban", List.of(playerIdOption)),
-                new CmdDef("online", "List players online", List.of()),
-                new CmdDef("help", "Show help", List.of()),
-                new CmdDef("getbanned", "Show banned players", List.of()),
-                new CmdDef("gettime", "Show current game time", List.of()),
-                new CmdDef("getweather", "Show current weather", List.of()),
-                new CmdDef("broadcast", "Broadcast message", List.of(textOption, channelOption)),
-                new CmdDef("group", "Group management", List.of(playerNameOption, groupOption)),
-                new CmdDef("kick", "Kick a player", List.of(playerNameOption, reasonOption)),
-                new CmdDef("makeadmin", "Make player admin", List.of(playerNameOption)),
-                new CmdDef("sethealth", "Set health", List.of(playerNameOption, intValueOption)),
-                new CmdDef("sethunger", "Set hunger", List.of(playerNameOption, intValueOption)),
-                new CmdDef("setthirst", "Set thirst", List.of(playerNameOption, intValueOption)),
-                new CmdDef("settime", "Set time", List.of(hourOption, minuteOption)),
-                new CmdDef("setweather", "Set weather", List.of(weatherOption)),
-                new CmdDef("support", "Support commands", List.of(playerNameOption, textOption)),
-                new CmdDef("teleporttoplayer", "Teleport to a player", List.of(playerNameOption, playerBNameOption)),
-                new CmdDef("unadmin", "Remove admin rights", List.of(playerNameOption)),
-                new CmdDef("yell", "Yell a message", List.of(textOption, channelOption)));
+                command("getversion", "Show the current DiscordConnect version"),
+                command("ban", "Ban a player", playerId, player, duration, reason),
+                command("restart", "Trigger server restart"),
+                command("reloadplugins", "Trigger plugin reload"),
+                command("unban", "Remove a player from ban", playerId, player),
+                command("online", "List players online"),
+                command("help", "Show help"),
+                command("getbanned", "Show banned players"),
+                command("gettime", "Show current game time"),
+                command("getweather", "Show current weather"),
+                command("broadcast", "Broadcast message", text, channel),
+                command("group", "Group management", player, group),
+                command("kick", "Kick a player", player, reason),
+                command("makeadmin", "Make player admin", player),
+                command("sethealth", "Set health", player, value),
+                command("sethunger", "Set hunger", player, value),
+                command("setthirst", "Set thirst", player, value),
+                command("settime", "Set time", hour, minute),
+                command("setweather", "Set weather", weather),
+                command("support", "Support commands", player, text),
+                command("teleporttoplayer", "Teleport to a player", player, target),
+                command("unadmin", "Remove admin rights", player),
+                command("yell", "Yell a message", text, channel));
     }
 
-    public static void syncCommandsForServer(DiscordApi api, Server server) {
-        syncCommandsForServer(api, server, getRequiredCommands());
+    public static void syncCommands(Guild guild) {
+        List<SlashCommandData> commands = getRequiredCommands().stream().map(def -> {
+            SlashCommandData command = Commands.slash(def.name(), def.description());
+            def.options().forEach(command::addOptions);
+            return command;
+        }).toList();
+        guild.updateCommands().addCommands(commands).queue(
+                ignored -> de.omegazirkel.risingworld.DiscordConnect.logger()
+                        .info("Synced slash commands for guild " + guild.getName()),
+                error -> de.omegazirkel.risingworld.DiscordConnect.logger()
+                        .error("Failed to sync commands for guild " + guild.getName() + ": " + error.getMessage()));
     }
 
-    /**
-     * syncronize commands for a single server
-     */
-    public static void syncCommandsForServer(DiscordApi api, Server server, List<CmdDef> requiredCommands) {
-        JavaCordBot.logger().info("🔄 Syncing slash commands for server: " + server.getName());
+    private static OptionData option(OptionType type, String name, String description, boolean required) {
+        return new OptionData(type, name, description, required);
+    }
 
-        try {
-            Set<ApplicationCommandBuilder<?, ?, ?>> builders = new HashSet<>();
-
-            for (CmdDef def : requiredCommands) {
-
-                SlashCommandBuilder builder = new SlashCommandBuilder()
-                        .setName(def.name())
-                        .setDescription(def.description());
-
-                def.options().forEach(builder::addOption);
-
-                builders.add(builder);
-            }
-
-            // Overwrite all server commands with exactly these
-            api.bulkOverwriteServerApplicationCommands(server, builders);
-            JavaCordBot.logger().info("✅ Command sync complete for server " + server.getName());
-        } catch (Exception e) {
-            JavaCordBot.logger().error("❌ Failed to sync commands: " + e.getMessage());
-            e.printStackTrace();
-        }
+    private static CmdDef command(String name, String description, OptionData... options) {
+        return new CmdDef(name, description, List.of(options));
     }
 }

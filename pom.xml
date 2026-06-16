@@ -8,7 +8,7 @@
 
     <groupId>com.github.devidian</groupId>
     <artifactId>rw-plugin-oz-discord-connect</artifactId>
-    <version>0.22.2</version>
+    <version>0.23.0</version>
 
     <name>OZDiscordConnect</name>
     <description>Rising World Discord-Connect Plugin by OmegaZirkel.de</description>
@@ -40,12 +40,11 @@
 
     <dependencies>
 
-        <!-- Javacord -->
+        <!-- JDA is supplied by OZTools -->
         <dependency>
-            <groupId>org.javacord</groupId>
-            <artifactId>javacord</artifactId>
-            <version>3.8.0</version>
-            <type>pom</type>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>6.4.2</version>
             <scope>provided</scope>
         </dependency>
 
@@ -53,22 +52,14 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4</version>
+            <version>5.6.1</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5-fluent</artifactId>
-            <version>5.4</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSON -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.14.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -84,7 +75,7 @@
         <dependency>
             <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.21.2</version>
+            <version>0.22.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -99,7 +90,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

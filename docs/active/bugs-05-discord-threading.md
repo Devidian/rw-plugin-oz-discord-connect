@@ -10,7 +10,7 @@ Supporting repositories/plugins: `rw-plugin-oz-tools`
 
 ## Dependencies
 - Runtime: Rising World development server, Discord bot, and configured webhooks
-- Build: OZTools `0.21.1`, Java 20, and Maven
+- Build: OZTools `0.22.0`, Java 20, and Maven
 - Optional integrations: Global Intercom
 
 ## Risks
@@ -31,16 +31,16 @@ Supporting repositories/plugins: `rw-plugin-oz-tools`
 - `rw-plugin-oz-tools`
 
 ## Rollback Considerations
-Do not restore direct JavaCord/timer-thread game API calls. Revert individual
+Do not restore direct JDA/timer-thread game API calls. Revert individual
 command DTO changes only if response compatibility regresses.
 
 ## Implementation Checklist
-- [x] Dispatch JavaCord listeners and timer game operations
+- [x] Dispatch JDA listeners and timer game operations
 - [x] Remove retained Player access from screenshot callbacks
-- [x] Remove blocking JavaCord response waits from the server thread
+- [x] Keep blocking Discord response waits on the bounded transport worker
 - [x] Move webhook and text-channel transport onto a bounded lifecycle-owned worker
-- [ ] Split slash-command input and output into immutable request/result DTOs
-- [ ] Add focused command-boundary regression tests
+- [x] Split slash-command input and output into immutable request/result DTOs
+- [x] Add focused command-boundary regression tests
 - [ ] Complete development-server runtime validation
 
 The DTO split and its focused tests are deferred until after the patch-release

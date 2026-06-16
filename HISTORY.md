@@ -1,5 +1,17 @@
 # History
 
+## [0.23.0] - 2026-06-15 | JDA migration
+
+- change: replace JavaCord with lifecycle-bound JDA 6.4.2
+- feat: convert Discord chat and slash-command callbacks into immutable DTOs before server-thread dispatch
+- feat: defer slash-command replies immediately and answer results on the bounded Discord transport worker
+- fix: parse `botAdmins` as exact Discord snowflake IDs and reject legacy names or partial matches
+- fix: normalize all command and option names to Discord-compatible lowercase
+- feat: send oversized help and banned-player results as text files
+- fix: use one lifecycle-bound Apache async HTTP client for all webhook sends
+- fix: queue server-start status behind JDA startup, preserve the client for queued shutdown status, and keep webhook status independent from bot enablement
+- change: update HttpClient to 5.6.1, Gson to 2.14.0, JUnit to 4.13.2, and OZTools to 0.22.0
+
 ## [0.22.2] - 2026-06-14 | Timer lifecycle
 
 - fix: bind restart and activity timers to plugin enable/disable lifecycle

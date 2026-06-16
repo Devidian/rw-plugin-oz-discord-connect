@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -39,16 +38,16 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.Method;
-import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.entity.user.UserStatus;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
 
 import de.omegazirkel.risingworld.discordconnect.ChatShortcutParser;
 import de.omegazirkel.risingworld.discordconnect.DiscordConnectPluginInfoStatusProvider;
-import de.omegazirkel.risingworld.discordconnect.JavaCordBot;
+import de.omegazirkel.risingworld.discordconnect.DiscordChatMessage;
+import de.omegazirkel.risingworld.discordconnect.DiscordCommandRequest;
+import de.omegazirkel.risingworld.discordconnect.DiscordCommandResult;
+import de.omegazirkel.risingworld.discordconnect.DiscordCommandService;
+import de.omegazirkel.risingworld.discordconnect.JdaDiscordClient;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
-import de.omegazirkel.risingworld.discordconnect.Utils;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginData;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginSettings;
 import de.omegazirkel.risingworld.tools.Colors;
@@ -91,7 +90,10 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	static final Colors c = Colors.getInstance();
 	private static I18n t = null;
 	private static PluginSettings s = null;
-	static JavaCordBot DiscordBot = null;
+	private JdaDiscordClient discordClient;
+	private DiscordCommandService commandService;
+	private CloseableHttpAsyncClient webhookHttpClient;
+	private String activeBotToken;
 	public static String name;
 	public static Connection sqliteCon;
 	public static PlayerSettings playerSettings;
@@ -147,6 +149,8 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				new DiagnosticThreadFactory("OZDiscordConnect", "Discord transport", "OZDiscordConnect-Transport",
 						true, logger()::debug),
 				(task, executor) -> logger().warn("Discord transport queue is full or shutting down; message dropped"));
+		webhookHttpClient = HttpAsyncClients.createDefault();
+		webhookHttpClient.start();
 		// Register event listener
 		registerEventListener(this);
 		t = I18n.getInstance(this);
@@ -159,7 +163,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			logger().info("ℹ️ Global Intercom found! ID: " + pluginGlobalIntercom.getID());
 		}
 		s.initSettings();
+		commandService = new DiscordCommandService(this);
 		this.initialize();
+		this.statusNotification("TC_STATUS_ENABLED");
 
 		// register plugin settings
 		AssetManager.loadIconFromPlugin(this, "icon-ki-discord-connect");
@@ -186,19 +192,28 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			String[] restartTimes = s.restartTimesString.split("\\|");
 			initRestartSchedule(restartTimes);
 		}
-		// only execute if DiscordBot was not yet initialized
-		if (DiscordBot != null)
-			return;
 		if (!s.botEnable) {
-			logger().warn("❌ DiscordBot is disabled");
+			stopDiscordClient();
+			logger().warn("Discord bot is disabled");
 			return;
 		}
-
-		try {
-			DiscordBot = new JavaCordBot(this);
-			DiscordBot.init();
-		} catch (Exception ex) {
-			logger().error(ex.toString());
+		if (discordClient == null || !s.botToken.equals(activeBotToken)) {
+			stopDiscordClient();
+			activeBotToken = s.botToken;
+			JdaDiscordClient client = new JdaDiscordClient(this);
+			discordClient = client;
+			submitDiscordTransport(() -> {
+				try {
+					client.start();
+				} catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+					logger().warn("JDA startup interrupted");
+					handleDiscordClientStartFailure(client);
+				} catch (RuntimeException ex) {
+					logger().error("JDA startup failed: " + ex.getMessage());
+					handleDiscordClientStartFailure(client);
+				}
+			});
 		}
 
 		// Start activity update timer
@@ -212,17 +227,16 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			}
 		};
 		activityTimer.schedule(activityTask, 0, 10000); // Check every 10 seconds
-		this.statusNotification("TC_STATUS_ENABLED");
 	}
 
 	private void updateDiscordActivity() {
-				if (s.botEnable && JavaCordBot.api != null && JavaCordBot.api.getStatus() == UserStatus.ONLINE) {
+				if (s.botEnable && discordClient != null && discordClient.isReady()) {
 					String currentActivity = "Running, " + Server.getPlayerCount() + " of " + Server.getMaxPlayerCount()
 							+ " players";
 					if (Server.getPlayerCount() == 0)
 						currentActivity = "Running, waiting for players!";
 					if (!currentActivity.equals(lastActivity)) {
-						JavaCordBot.api.updateActivity(currentActivity);
+						discordClient.updateActivity(currentActivity);
 						lastActivity = currentActivity;
 						logger().debug("Updated Discord activity to: " + currentActivity);
 					}
@@ -244,13 +258,42 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			PluginInfoStatusProviders.unregisterProvider(name);
 		}
 		this.statusNotification("TC_STATUS_DISABLED");
+		stopDiscordClient();
 		shutdownDiscordTransport();
-		if (s.botEnable) {
-			JavaCordBot.disconnect();
-			DiscordBot = null;
-		}
+		closeWebhookHttpClient();
+		commandService = null;
 		closeDatabase();
 		DiscordConnect.instance = null;
+	}
+
+	private void stopDiscordClient() {
+		JdaDiscordClient client = discordClient;
+		discordClient = null;
+		activeBotToken = null;
+		if (client != null) {
+			client.stopAccepting();
+			submitDiscordTransport(client::close);
+		}
+	}
+
+	private void handleDiscordClientStartFailure(JdaDiscordClient client) {
+		client.close();
+		if (discordClient == client) {
+			discordClient = null;
+			activeBotToken = null;
+		}
+	}
+
+	private void closeWebhookHttpClient() {
+		CloseableHttpAsyncClient client = webhookHttpClient;
+		webhookHttpClient = null;
+		if (client != null) {
+			try {
+				client.close();
+			} catch (IOException ex) {
+				logger().warn("Failed to close Discord webhook HTTP client: " + ex.getMessage());
+			}
+		}
 	}
 
 	void initializeTimers() {
@@ -539,7 +582,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			int playersLeft = Server.getPlayerCount() - 1;
 			if (playersLeft == 0) {
 				this.sendDiscordStatusMessage(t.get("TC_RESTART_PLAYER_LAST", s.botLang));
-				JavaCordBot.api.updateActivity("Restarting...");
+				updateDiscordActivity("Restarting...");
 				restart();
 			} else if (playersLeft > 1) {
 				this.broadcastMessage("TC_BC_PLAYER_REMAIN", playersLeft);
@@ -561,33 +604,20 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 */
 	public void sendDiscordMessageToTextChannel(String message, long channelId, byte[] image) {
 		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
-		submitDiscordTransport(() -> sendDiscordMessageToTextChannelNow(message, channelId, imageCopy));
+		JdaDiscordClient client = discordClient;
+		submitDiscordTransport(() -> sendDiscordMessageToTextChannelNow(client, message, channelId, imageCopy));
 	}
 
-	private void sendDiscordMessageToTextChannelNow(String message, long channelId, byte[] image) {
+	private void sendDiscordMessageToTextChannelNow(JdaDiscordClient client, String message, long channelId, byte[] image) {
 		if (channelId == 0) {
 			logger().warn("⚠️ channelId = 0, set channelId in plugin settings or deactivate this channel");
 			return;
 		}
-		Optional<Channel> channel = JavaCordBot.api.getChannelById(channelId);
-		if (!channel.isEmpty()) {
-			ServerTextChannel tc = channel.get().asServerTextChannel().get();
-			if (image != null) {
-				try {
-					tc.sendMessage(message, Utils.byteArrayToFile(image, "screenshot.jpg")).join();
-				} catch (IOException e) {
-					logger().error("Exception on sending discord chat message: " + e.getMessage());
-					e.printStackTrace();
-					// send without image
-					tc.sendMessage(message).join();
-				}
-			} else {
-				tc.sendMessage(message).join();
-			}
-			logger().debug("✅ Sent message to #" + tc.getName() + ": " + message);
-		} else {
-			logger().error("❌ ChannelId <" + channelId + "> not found not found cant send message: " + message);
+		if (client == null) {
+			logger().warn("Cannot send direct Discord channel message while bot is disabled");
+			return;
 		}
+		client.sendChannelMessage(channelId, message, image);
 	}
 
 	/**
@@ -603,7 +633,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	}
 
 	private void sendDiscordMessageToWebHookNow(String username, String text, URI channel, byte[] image) {
-		if (channel == null || channel.toString() == "") {
+		if (channel == null || channel.toString().isBlank()) {
 			logger().error("⚠️ Cant send message to webhook <channel:" +
 					channel + "> <text:" + text + "> <username:" + username + ">");
 			return;
@@ -615,7 +645,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		if (username.length() > 32)
 			username = username.substring(0, 31);
 
-		JSONObject json = new JSONObject();
+		java.util.Map<String, String> json = new java.util.HashMap<>();
 		json.put("content", text);
 		json.put("username", username);
 
@@ -624,12 +654,16 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			json.put("avatar_url", avatarUrl);
 		}
 
-		try (CloseableHttpAsyncClient client = HttpAsyncClients.createDefault()) {
-			client.start();
+		CloseableHttpAsyncClient client = webhookHttpClient;
+		if (client == null) {
+			logger().warn("Discord webhook HTTP client is unavailable");
+			return;
+		}
+		try {
 
 			// ---------- send text message ----------
 			SimpleHttpRequest post = SimpleHttpRequest.create(Method.POST, channel);
-			post.setBody(json.toJSONString(), ContentType.APPLICATION_JSON);
+			post.setBody(new Gson().toJson(json), ContentType.APPLICATION_JSON);
 
 			CompletableFuture<SimpleHttpResponse> textFuture = new CompletableFuture<>();
 
@@ -731,7 +765,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			CompletableFuture.allOf(textFuture, imageFuture).join();
 
 		} catch (Exception ex) {
-			logger().error("Error initializing async client: " + ex.getMessage());
+			logger().error("Discord webhook request failed: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
@@ -784,9 +818,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	public void sendDiscordChatMessage(String username, String text, byte[] image, String language) {
-		if (s.webHookChatUrl != null && s.webHookChatUrl.toString() != "")
+		if (s.webHookChatUrl != null && !s.webHookChatUrl.toString().isBlank())
 			this.sendDiscordMessageToWebHook(username, text, s.webHookChatUrl, image);
-		else if (s.chatChannelId != 0 && JavaCordBot.api != null) {
+		else if (s.chatChannelId != 0 && discordClient != null) {
 			String message = s.discordChatSyntax
 					.replace("**PH_PLAYER**", username)
 					.replace("**PH_MESSAGE**", text)
@@ -814,9 +848,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	private void sendDiscordSupportMessage(String username, String text, byte[] image, String language) {
-		if (s.webHookSupportUrl != null && s.webHookSupportUrl.toString() != "")
+		if (s.webHookSupportUrl != null && !s.webHookSupportUrl.toString().isBlank())
 			this.sendDiscordMessageToWebHook(username, text, s.webHookSupportUrl, image);
-		else if (s.supportChannelId != 0 && JavaCordBot.api != null) {
+		else if (s.supportChannelId != 0 && discordClient != null) {
 			String message = s.discordChatSyntax
 					.replace("**PH_PLAYER**", username)
 					.replace("**PH_MESSAGE**", text)
@@ -834,9 +868,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param text
 	 */
 	public void sendDiscordStatusMessage(String text) {
-		if (s.webHookStatusUrl != null && s.webHookStatusUrl.toString() != "")
+		if (s.webHookStatusUrl != null && !s.webHookStatusUrl.toString().isBlank())
 			this.sendDiscordMessageToWebHook(getStatusUserName(), text, s.webHookStatusUrl, null);
-		else if (s.statusChannelId != 0 && JavaCordBot.api != null) {
+		else if (s.statusChannelId != 0 && discordClient != null) {
 			this.sendDiscordMessageToTextChannel(text, s.statusChannelId);
 		} else {
 			logger().error("❌ Unable to send status message: " + text);
@@ -850,9 +884,9 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	 * @param text
 	 */
 	public void sendDiscordEventMessage(String text) {
-		if (s.webHookEventUrl != null && s.webHookEventUrl.toString() != "")
+		if (s.webHookEventUrl != null && !s.webHookEventUrl.toString().isBlank())
 			this.sendDiscordMessageToWebHook(getStatusUserName(), text, s.webHookEventUrl, null);
-		else if (s.eventChannelId != 0 && JavaCordBot.api != null) {
+		else if (s.eventChannelId != 0 && discordClient != null) {
 			this.sendDiscordMessageToTextChannel(text, s.eventChannelId);
 		} else {
 			logger().error("❌ Unable to send event message: " + text);
@@ -984,6 +1018,39 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		return serverThreadDispatcher != null && serverThreadDispatcher.dispatch(task);
 	}
 
+	public boolean dispatchDiscordChat(DiscordChatMessage message) {
+		return dispatchServer(() -> {
+			if (!message.channelName().equalsIgnoreCase(s.botChatChannelName)
+					&& message.channelId() != s.chatChannelId) {
+				return;
+			}
+			String color = message.admin() && s.showGroup ? s.colorLocalAdmin : s.colorLocalDiscord;
+			String group = message.admin() && s.showGroup ? " (discord/admin)" : "";
+			Server.broadcastTextMessage(color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", "discord")
+					+ message.displayName() + group + ": " + c.endTag + message.content());
+		});
+	}
+
+	public boolean dispatchDiscordCommand(DiscordCommandRequest request) {
+		return dispatchServer(() -> {
+			DiscordCommandService service = commandService;
+			if (service == null) {
+				sendDiscordCommandResult(DiscordCommandResult.text(request.responseToken(), "Plugin is disabled"));
+				return;
+			}
+			sendDiscordCommandResult(service.execute(request));
+		});
+	}
+
+	private void sendDiscordCommandResult(DiscordCommandResult result) {
+		submitDiscordTransport(() -> {
+			JdaDiscordClient client = discordClient;
+			if (client != null) {
+				client.sendResult(result);
+			}
+		});
+	}
+
 	/**
 	 *
 	 * @param i18nIndex
@@ -1044,7 +1111,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			logger().error("DiscordConnect instance is null, cannot execute forceRestart()");
 			return;
 		}
-		JavaCordBot.api.updateActivity("Restarting soon...");
+		instance.updateDiscordActivity("Restarting soon...");
 
 		instance.statusNotification("TC_STATUS_RESTART_FORCED");
 		instance.executeDelayed(5, () -> {
@@ -1063,7 +1130,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			return;
 		}
 
-		JavaCordBot.api.updateActivity("Restarting soon...");
+		instance.updateDiscordActivity("Restarting soon...");
 		instance.executeDelayed(5, () -> {
 			if (s.useShutdownNotRestart)
 				Server.sendInputCommand("shutdown");
@@ -1078,13 +1145,27 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					.replace("PH_PLUGIN_NAME", this.getDescription("name"))
 					.replace("PH_PLUGIN_VERSION", this.getDescription("version"))
 					.replace("PH_PLAYER_COUNT", Server.getPlayerCount() + "");
-			// Sende Statusnachricht nur, wenn der Bot aktiviert und verbunden ist
-			if (s.botEnable && JavaCordBot.api != null && JavaCordBot.api.getStatus() == UserStatus.ONLINE) {
+			// Direct channel sends are queued behind an in-progress JDA startup.
+			if (canSendStatusNotification(
+					s.webHookStatusUrl != null && !s.webHookStatusUrl.toString().isBlank(),
+					s.botEnable,
+					discordClient != null)) {
 
 				this.sendDiscordStatusMessage(messageText);
 			} else {
 				logger().warn("Could not send: " + messageText);
 			}
+		}
+	}
+
+	static boolean canSendStatusNotification(boolean webhookConfigured, boolean botEnabled, boolean clientPresent) {
+		return webhookConfigured || (botEnabled && clientPresent);
+	}
+
+	private void updateDiscordActivity(String activity) {
+		JdaDiscordClient client = discordClient;
+		if (client != null) {
+			client.updateActivity(activity);
 		}
 	}
 }

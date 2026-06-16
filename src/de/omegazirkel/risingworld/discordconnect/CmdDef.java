@@ -1,10 +1,8 @@
 package de.omegazirkel.risingworld.discordconnect;
 
 import java.util.List;
-import org.javacord.api.interaction.SlashCommandOption;
 
-public record CmdDef(
-    String name,
-    String description,
-    List<SlashCommandOption> options
-) {}
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
+public record CmdDef(String name, String description, List<OptionData> options) {
+}
