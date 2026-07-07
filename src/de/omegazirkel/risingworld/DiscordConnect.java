@@ -177,7 +177,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			PluginInfoStatusProviders
 					.registerProvider(new DiscordConnectPluginInfoStatusProvider(this, getDescription("version")));
 			PluginShortcutVisibility.register(name, DiscordConnectPlayerPluginSettings::shortcutVisible);
-			PluginMenuManager.registerPluginMenu(new MenuItem(name, AssetManager.getIcon("icon-ki-discord-connect"),
+			PluginMenuManager.registerPluginMenu(new MenuItem(name, "icon-ki-discord-connect",
 					"Discord Connect", player -> {
 						player.hideRadialMenu(true);
 						PluginInfoStatusProviders.show(player, name);
