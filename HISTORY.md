@@ -1,5 +1,9 @@
 # History
 
+## [0.23.1] - 2026-07-14 | Icon set polish
+
+- change: rename Discord icon keys to their final semantic names
+
 ## [0.23.0] - 2026-06-15 | JDA migration
 
 - change: replace JavaCord with lifecycle-bound JDA 6.4.2

@@ -168,7 +168,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		this.statusNotification("TC_STATUS_ENABLED");
 
 		// register plugin settings
-		AssetManager.loadIconFromPlugin(this, "icon-ki-discord-connect");
+		AssetManager.loadIconFromPlugin(this, "oz-discord-connect");
 		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings(getDescription("version")));
 		PlayerPluginSettingsOverlay.registerPlayerPluginData(new DiscordConnectPlayerPluginData(getDescription("version")));
 		PlayerPluginSettingsOverlay.registerPlayerPluginAdminSettings(
@@ -177,7 +177,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			PluginInfoStatusProviders
 					.registerProvider(new DiscordConnectPluginInfoStatusProvider(this, getDescription("version")));
 			PluginShortcutVisibility.register(name, DiscordConnectPlayerPluginSettings::shortcutVisible);
-			PluginMenuManager.registerPluginMenu(new MenuItem(name, "icon-ki-discord-connect",
+			PluginMenuManager.registerPluginMenu(new MenuItem(name, "oz-discord-connect",
 					"Discord Connect", player -> {
 						player.hideRadialMenu(true);
 						PluginInfoStatusProviders.show(player, name);

@@ -34,7 +34,7 @@ Supporting repository:
 The radial button can be removed without changing Discord runtime behavior.
 
 ## Progress Notes
-- Phase 1 complete: Discord Connect registers a radial menu entry with the Tools-provided `icon-ki-info-status` icon.
+- Phase 1 complete: Discord Connect registers a radial menu entry with the Tools-provided `info-status` icon.
 - Phase 2 complete: the radial entry opens the existing shared Tools Info/Status provider; `/dc info` and `/dc status` are unchanged.
 - Phase 3 complete: README/HISTORY were updated.
 - Validation passed with `mvn -B test` and `mvn -B -DskipTests package`.
