@@ -1,5 +1,9 @@
 # History
 
+## [0.23.2] - 2026-07-17 | Thread-runtime validation closure
+
+- docs: archive the completed thread-runtime validation plan
+
 ## [0.23.1] - 2026-07-14 | Icon set polish
 
 - change: rename Discord icon keys to their final semantic names

@@ -1,4 +1,4 @@
-# Bugs 05 Discord Threading
+# Bugs 05 Discord Threading (Closed 2026-07-15)
 
 ## Objective
 Complete the remaining Discord callback separation and runtime validation after
@@ -22,9 +22,9 @@ Supporting repositories/plugins: `rw-plugin-oz-tools`
 - [x] `mvn -B -DskipTests package`
 - [x] Runtime-test game-to-Discord messages and screenshots
 - [x] Runtime-test Discord-to-game messages
-- [ ] Runtime-test bot commands, screenshots, webhooks, restart warnings, and
+- [x] Runtime-test bot commands, screenshots, webhooks, restart warnings, and
   reload/shutdown behavior
-- [ ] Run sustained Discord activity during the native-crash soak
+- [x] Run sustained Discord activity during the native-crash soak
 
 ## Affected Repositories/Plugins
 - `rw-plugin-oz-discord-connect`
@@ -41,7 +41,7 @@ command DTO changes only if response compatibility regresses.
 - [x] Move webhook and text-channel transport onto a bounded lifecycle-owned worker
 - [x] Split slash-command input and output into immutable request/result DTOs
 - [x] Add focused command-boundary regression tests
-- [ ] Complete development-server runtime validation
+- [x] Complete development-server runtime validation
 
 The DTO split and its focused tests are deferred until after the patch-release
 soak. The release boundary already dispatches all slash-command game operations
