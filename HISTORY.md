@@ -1,5 +1,9 @@
 # History
 
+## [0.23.4] - 2026-07-20 | Advanced button controls
+
+- change: update the shared OZ Tools UI dependency to the stable button controls
+
 ## [0.23.3] - 2026-07-20 | Update metadata
 
 - change: publish the canonical GitHub release source for OZ Tools update management
