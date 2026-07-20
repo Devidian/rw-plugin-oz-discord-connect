@@ -1,5 +1,9 @@
 # History
 
+## [0.23.3] - 2026-07-20 | Update metadata
+
+- change: publish the canonical GitHub release source for OZ Tools update management
+
 ## [0.23.2] - 2026-07-17 | Thread-runtime validation closure
 
 - docs: archive the completed thread-runtime validation plan
