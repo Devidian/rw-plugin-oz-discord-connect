@@ -1,5 +1,10 @@
 # History
 
+## [0.23.5] - 2026-07-21 | Standalone intercom bridge
+
+- change: update the shared OZ Tools UI dependency to version 0.23.1 for the stable button controls
+- fix: remove the Global Intercom build dependency while preserving its optional chat filtering
+
 ## [0.23.4] - 2026-07-20 | Advanced button controls
 
 - change: update the shared OZ Tools UI dependency to the stable button controls

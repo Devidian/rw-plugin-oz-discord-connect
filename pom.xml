@@ -8,7 +8,7 @@
 
     <groupId>com.github.devidian</groupId>
     <artifactId>rw-plugin-oz-discord-connect</artifactId>
-    <version>0.23.4</version>
+    <version>0.23.5</version>
 
     <name>OZDiscordConnect</name>
     <description>Rising World Discord-Connect Plugin by OmegaZirkel.de</description>
@@ -29,11 +29,6 @@
         <repository>
             <id>github-oz-tools</id>
             <url>https://maven.pkg.github.com/Devidian/rw-plugin-oz-tools</url>
-        </repository>
-
-        <repository>
-            <id>github-oz-globalintercom</id>
-            <url>https://maven.pkg.github.com/Devidian/rw-plugin-oz-global-intercom</url>
         </repository>
 
     </repositories>
@@ -66,16 +61,8 @@
         <!-- OZ Plugins -->
         <dependency>
             <groupId>com.github.devidian</groupId>
-            <artifactId>rw-plugin-oz-global-intercom</artifactId>
-            <version>0.15.0</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.devidian</groupId>
             <artifactId>rw-plugin-oz-tools</artifactId>
-            <version>0.23.0</version>
+            <version>0.23.1</version>
             <scope>provided</scope>
         </dependency>
 

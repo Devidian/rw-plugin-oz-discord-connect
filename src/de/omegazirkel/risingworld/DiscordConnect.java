@@ -473,8 +473,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 		}
 
 		if (pluginGlobalIntercom != null) {
-			processMessage = !((GlobalIntercom) pluginGlobalIntercom).isGIMessage(event.getPlayer(),
-					event.getChatMessage());
+			processMessage = !isGlobalIntercomMessage(event.getPlayer(), event.getChatMessage());
 			if (noColorText.startsWith("#%")) {
 				noColorText = noColorText.substring(2);
 			}
@@ -521,6 +520,20 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				broadcastChatMessage(player, noColorText);
 				event.setCancelled(true);
 			}
+		}
+	}
+
+	private boolean isGlobalIntercomMessage(Player player, String message) {
+		try {
+			Object result = pluginGlobalIntercom.getClass()
+					.getMethod("isGIMessage", Player.class, String.class)
+					.invoke(pluginGlobalIntercom, player, message);
+			return Boolean.TRUE.equals(result);
+		} catch (ReflectiveOperationException ex) {
+			logger().warn("Global Intercom does not provide isGIMessage(Player, String); chat filtering disabled: "
+					+ ex.getMessage());
+			pluginGlobalIntercom = null;
+			return false;
 		}
 	}
 
