@@ -44,8 +44,8 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
                 .replace("PH_ALLOW_RESTART", String.valueOf(settings.allowRestart))
                 .replace("PH_RESTART_TIMED", String.valueOf(settings.restartTimed))
                 .replace("PH_JOIN_DISCORD", String.valueOf(settings.joinDiscord != null && !settings.joinDiscord.isBlank()))
-                .replace("PH_LANGUAGE", player.getLanguage() + " / " + player.getSystemLanguage())
-                .replace("PH_USEDLANG", t().getLanguageUsed(player.getSystemLanguage()))
+                .replace("PH_LANGUAGE", player.getLanguage() + " / " + de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player))
+                .replace("PH_USEDLANG", t().getLanguageUsed(de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player)))
                 .replace("PH_LANG_AVAILABLE", t().getLanguageAvailable());
     }
 

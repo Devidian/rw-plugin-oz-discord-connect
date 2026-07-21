@@ -342,7 +342,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	@EventMethod
 	public void onPlayerCommand(PlayerCommandEvent event) {
 		Player player = event.getPlayer();
-		String lang = player.getSystemLanguage();
+		String lang = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 		String commandLine = event.getCommand();
 		Vector3f pos = player.getPosition();
 
@@ -420,7 +420,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 					}
 					logger().debug("Taking screenshot with factor " + sizeFactor);
 					final int playerDbId = player.getDbID();
-					final String playerLanguage = player.getSystemLanguage();
+					final String playerLanguage = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 					player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
 						final ByteArrayOutputStream os = new ByteArrayOutputStream();
 						try {
@@ -440,7 +440,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 						}
 					});
 				} else {
-					this.sendDiscordSupportMessage("SupportTicket", supportMessage, player.getSystemLanguage());
+					this.sendDiscordSupportMessage("SupportTicket", supportMessage, de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player));
 					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
 				}
 			} else {
@@ -498,7 +498,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				}
 				final String textToSend = noColorText;
 				final String playerName = player.getName();
-				final String playerLanguage = player.getSystemLanguage();
+				final String playerLanguage = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 				logger().debug("Taking screenshot with factor " + sizeFactor);
 				player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -514,7 +514,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 				if (hasScreenshot == true) {
 					logger().warn("⚠️ Screenshot taking not enabled");
 				}
-				this.sendDiscordChatMessage(player.getName(), noColorText, player.getSystemLanguage());
+				this.sendDiscordChatMessage(player.getName(), noColorText, de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player));
 			}
 			if (s.colorizeChat) {
 				broadcastChatMessage(player, noColorText);
@@ -559,7 +559,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 			}
 
 			player.sendTextMessage(
-					color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", eventPlayer.getSystemLanguage())
+					color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", de.omegazirkel.risingworld.OZTools.getPlayerLanguage(eventPlayer))
 							+ eventPlayer.getName() + group + ": " + c.text + noColorText);
 		}
 	}
@@ -572,7 +572,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	public void onPlayerSpawn(PlayerSpawnEvent event) {
 		if (s.sendPluginWelcome) {
 			Player player = event.getPlayer();
-			String lang = player.getSystemLanguage();
+			String lang = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 			player.sendTextMessage(t.get("TC_MSG_PLUGIN_WELCOME", lang)
 					.replace("PH_PLUGIN_NAME", getDescription("name"))
 					.replace("PH_PLUGIN_CMD", pluginCMD)
@@ -1072,7 +1072,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	private void broadcastMessage(String i18nIndex, String playerName) {
 		for (Player player : Server.getAllPlayers()) {
 			try {
-				String lang = player.getSystemLanguage();
+				String lang = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 				player.sendTextMessage(c.warning + this.getName() + ":> " + c.text
 						+ t.get(i18nIndex, lang).replace("PH_PLAYER", playerName));
 			} catch (Exception e) {
@@ -1090,7 +1090,7 @@ public class DiscordConnect extends Plugin implements Listener, FileChangeListen
 	private void broadcastMessage(String i18nIndex, int number) {
 		for (Player player : Server.getAllPlayers()) {
 			try {
-				String lang = player.getSystemLanguage();
+				String lang = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 				player.sendTextMessage(c.warning + this.getName() + ":> " + c.text
 						+ t.get(i18nIndex, lang).replace("PH_NUMBER", number + ""));
 			} catch (Exception e) {
