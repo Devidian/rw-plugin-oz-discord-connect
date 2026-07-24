@@ -1,5 +1,12 @@
 # History
 
+## Unreleased
+
+## [0.23.7] - 2026-07-24 | Runtime architecture
+
+- refactor: keep the plugin entry point limited to lifecycle wiring and event delegation
+- change: update the shared OZ Tools dependency to version 0.23.8
+
 ## [0.23.5] - 2026-07-21 | Standalone intercom bridge
 
 - change: update the shared OZ Tools UI dependency to version 0.23.1 for the stable button controls
