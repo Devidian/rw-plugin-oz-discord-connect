@@ -1,6 +1,8 @@
 # History
 
-## Unreleased
+## [0.23.8] - 2026-08-05 | CI maintenance
+
+- build: maintain the GitHub Actions release workflow.
 
 ## [0.23.7] - 2026-07-24 | Runtime architecture
 
