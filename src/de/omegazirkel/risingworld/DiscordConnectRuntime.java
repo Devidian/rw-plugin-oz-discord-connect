@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -163,6 +165,7 @@ class DiscordConnectRuntime extends Plugin {
 
 		// register plugin settings
 		AssetManager.loadIconFromPlugin(this, "oz-discord-connect");
+		AssetManager.loadIconFromPlugin(this, "discord-logo");
 		PlayerPluginSettingsOverlay.registerPlayerPluginSettings(new DiscordConnectPlayerPluginSettings(getDescription("version")));
 		PlayerPluginSettingsOverlay.registerPlayerPluginData(new DiscordConnectPlayerPluginData(getDescription("version")));
 		PlayerPluginSettingsOverlay.registerPlayerPluginAdminSettings(
@@ -173,12 +176,22 @@ class DiscordConnectRuntime extends Plugin {
 								(DiscordConnect) this, getDescription("version")));
 			PluginShortcutVisibility.register(name, DiscordConnectPlayerPluginSettings::shortcutVisible);
 			PluginMenuManager.registerPluginMenu(new MenuItem(name, "oz-discord-connect",
-					"Discord Connect", player -> {
-						player.hideRadialMenu(true);
-						PluginInfoStatusProviders.show(player, name);
-					}));
+					"Discord Connect", this::openPluginMenu));
 			logger().info("✅ " + this.getName() + " Plugin is enabled version:" + this.getDescription("version"));
 
+	}
+
+	private void openPluginMenu(Player player) {
+		List<MenuItem> items = new ArrayList<>();
+		items.add(new MenuItem("oz-discord-connect", t.get("TC_MENU_INFO_STATUS", player), p -> {
+			p.hideRadialMenu(true);
+			PluginInfoStatusProviders.show(p, name);
+		}));
+		if (s.joinDiscord != null && !s.joinDiscord.isBlank())
+			items.add(new MenuItem("discord-logo", t.get("TC_MENU_JOIN_DISCORD", player),
+					p -> p.connectToDiscord("https://discord.gg/" + s.joinDiscord)));
+		items.add(MenuItem.closeMenu(player));
+		PluginMenuManager.showMenu(player, items);
 	}
 
 	private void initialize() {

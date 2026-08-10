@@ -1,5 +1,10 @@
 # History
 
+## [0.24.0] - 2026-08-10 | Plugin radial menu
+
+- feat: open Discord Connect from the shared plugin radial menu with Info / Status, Connect, and Close actions
+- fix: localize the Info / Status and Connect menu actions in German, English, French, and Russian
+
 ## [0.23.8] - 2026-08-05 | CI maintenance
 
 - build: maintain the GitHub Actions release workflow.
