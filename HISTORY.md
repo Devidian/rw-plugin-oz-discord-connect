@@ -1,5 +1,9 @@
 # History
 
+## [0.24.1] - 2026-08-14 | Restart login lock
+
+- fix: lock the server when Discord or the scheduled restart flow sets the restart flag, preventing new logins until restart
+
 ## [0.24.0] - 2026-08-10 | Plugin radial menu
 
 - feat: open Discord Connect from the shared plugin radial menu with Info / Status, Connect, and Close actions

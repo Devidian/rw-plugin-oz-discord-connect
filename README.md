@@ -17,6 +17,7 @@
 - normal chat messages which contain `+tp` or `+t` as a token include the player's current coordinates
 - Public API for other plugins (status/event channel)
 - Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
+- Discord-triggered and scheduled restart flags lock the server immediately, preventing new logins until the restart completes
 - Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts
 
 The bot uses JDA 6.4.2. Enable the privileged `MESSAGE_CONTENT` intent in the

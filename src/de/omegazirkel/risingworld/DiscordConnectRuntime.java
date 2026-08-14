@@ -112,7 +112,15 @@ class DiscordConnectRuntime extends Plugin {
 	static String lastActivity = "";
 
 	public void setFlagRestart(boolean value) {
+		if (value && !flagRestart) {
+			lockServerForRestart();
+		}
 		flagRestart = value;
+	}
+
+	private void lockServerForRestart() {
+		Server.sendInputCommand("lock");
+		logger().info("Server locked to prevent logins until restart");
 	}
 
 	public String getBotLanguage() {
@@ -375,7 +383,7 @@ class DiscordConnectRuntime extends Plugin {
 						String msgDC = t.get("TC_DC_SHUTDOWN", s.botLang).replace("PH_PLAYER", player.getName());
 						this.sendDiscordStatusMessage(msgDC);
 						this.broadcastMessage("TC_BC_SHUTDOWN", player.getName());
-						flagRestart = true;
+						setFlagRestart(true);
 					} else {
 						player.sendTextMessage(
 								c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_RESTART_NOTALLOWED", lang));
@@ -1008,7 +1016,7 @@ class DiscordConnectRuntime extends Plugin {
 					if (playerNum > 0) {
 						logger().info("Setting restart flag for scheduled server-restart");
 						broadcastMessage("TC_RS_SCHEDULE_INFO");
-						flagRestart = true;
+						setFlagRestart(true);
 						if (DiscordConnect.instance != null)
 							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_FLAG");
 						if (s.forceRestartAfter > 0) {
