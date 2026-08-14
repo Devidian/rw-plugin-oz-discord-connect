@@ -383,7 +383,7 @@ class DiscordConnectRuntime extends Plugin {
 						String msgDC = t.get("TC_DC_SHUTDOWN", s.botLang).replace("PH_PLAYER", player.getName());
 						this.sendDiscordStatusMessage(msgDC);
 						this.broadcastMessage("TC_BC_SHUTDOWN", player.getName());
-						setFlagRestart(true);
+						flagRestart = true;
 					} else {
 						player.sendTextMessage(
 								c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_RESTART_NOTALLOWED", lang));

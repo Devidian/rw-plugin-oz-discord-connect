@@ -1,5 +1,9 @@
 # History
 
+## [0.24.2] - 2026-08-14 | Restart lock scope
+
+- fix: restrict the restart login lock to Discord-triggered and scheduled restart flags; in-game restart requests retain their existing behavior
+
 ## [0.24.1] - 2026-08-14 | Restart login lock
 
 - fix: lock the server when Discord or the scheduled restart flow sets the restart flag, preventing new logins until restart
