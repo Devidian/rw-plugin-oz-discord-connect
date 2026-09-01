@@ -33,7 +33,7 @@ public final class DiscordCommandService {
                 case "getversion" -> text(request, "Plugin version: " + plugin.getDescription("version")
                         + "\nGame version: " + plugin.getGameVersion());
                 case "online" -> online(request);
-                case "help" -> longText(request, plugin.getTranslator().get("TC_DISCORD_HELP_SHORT", settings.botLang),
+                case "help" -> longText(request, plugin.getTranslator().get("tc.discord.help.short", settings.botLang),
                         "discord-help.txt");
                 case "getbanned" -> banned(request);
                 case "gettime" -> gameTime(request);
@@ -79,10 +79,10 @@ public final class DiscordCommandService {
 
     private DiscordCommandResult online(DiscordCommandRequest request) {
         if (Server.getPlayerCount() == 0) {
-            return text(request, plugin.getTranslator().get("TC_CMD_OUT_ONLINE_NOBODY", settings.botLang));
+            return text(request, plugin.getTranslator().get("tc.cmd.out.online.nobody", settings.botLang));
         }
         StringJoiner players = new StringJoiner("\n",
-                plugin.getTranslator().get("TC_CMD_OUT_ONLINE_LIST", settings.botLang) + "\n", "");
+                plugin.getTranslator().get("tc.cmd.out.online.list", settings.botLang) + "\n", "");
         for (Player player : Server.getAllPlayers()) {
             players.add(player.getName() + " uid:" + player.getUID() + " g:" + player.getPermissionGroup()
                     + (player.isAdmin() ? " [A]" : ""));
@@ -92,7 +92,7 @@ public final class DiscordCommandService {
 
     private DiscordCommandResult banned(DiscordCommandRequest request) throws Exception {
         StringJoiner resultText = new StringJoiner("\n",
-                plugin.getTranslator().get("TC_CMD_OUT_BANNED_LIST", settings.botLang) + "\n", "");
+                plugin.getTranslator().get("tc.cmd.out.banned.list", settings.botLang) + "\n", "");
         try (ResultSet result = plugin.getWorldDatabase(Target.Bans).executeQuery("SELECT * FROM `Banlist`")) {
             while (result.next()) {
                 resultText.add(result.getString(2) + " (" + result.getLong(1) + ") banned for: " + result.getString(7));
@@ -104,7 +104,7 @@ public final class DiscordCommandService {
     private DiscordCommandResult gameTime(DiscordCommandRequest request) {
         String season = plugin.getTranslator().get(
                 "TC_SEASON_" + Server.getCurrentSeason().toString().toUpperCase(), settings.botLang);
-        return text(request, plugin.getTranslator().get("TC_CMD_OUT_TIME", settings.botLang)
+        return text(request, plugin.getTranslator().get("tc.cmd.out.time", settings.botLang)
                 .replace("PH_TIME", Server.getGameTime(Unit.Hours) + ":" + Server.getGameTime(Unit.Minutes))
                 .replace("PH_SEASON", season)
                 .replace("PH_YEAR", String.valueOf(Server.getGameTime(Unit.Years)))
@@ -113,7 +113,7 @@ public final class DiscordCommandService {
 
     private DiscordCommandResult weather(DiscordCommandRequest request) {
         WeatherDefs.Weather current = Server.getCurrentWeather();
-        return text(request, plugin.getTranslator().get("TC_CMD_OUT_WEATHER", settings.botLang)
+        return text(request, plugin.getTranslator().get("tc.cmd.out.weather", settings.botLang)
                 .replace("PH_WEATHER", plugin.getTranslator().get(
                         "TC_WEATHER_" + current.name.toUpperCase(), settings.botLang)));
     }

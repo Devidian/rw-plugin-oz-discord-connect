@@ -25,7 +25,7 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
 
     @Override
     public String getInfo(Player player) {
-        return t().get("TC_DISCORD_CONNECT_INFO_PANEL_INFO", player)
+        return t().get("tc.discord.connect.info.panel.info", player)
                 .replace("PH_PLUGIN_NAME", pluginName)
                 .replace("PH_VERSION", version)
                 .replace("PH_PLUGIN_CMD", "dc");
@@ -34,7 +34,7 @@ public class DiscordConnectPluginInfoStatusProvider implements PluginInfoStatusP
     @Override
     public String getStatus(Player player) {
         PluginSettings settings = PluginSettings.getInstance();
-        return t().get("TC_DISCORD_CONNECT_INFO_PANEL_STATUS", player)
+        return t().get("tc.discord.connect.info.panel.status", player)
                 .replace("PH_BOT_ENABLED", String.valueOf(settings.botEnable))
                 .replace("PH_POST_CHAT", String.valueOf(settings.postChat))
                 .replace("PH_POST_SUPPORT", String.valueOf(settings.postSupport))

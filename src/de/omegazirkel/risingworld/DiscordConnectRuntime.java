@@ -169,7 +169,7 @@ class DiscordConnectRuntime extends Plugin {
 		s.initSettings();
 			commandService = new DiscordCommandService((DiscordConnect) this);
 		this.initialize();
-		this.statusNotification("TC_STATUS_ENABLED");
+		this.statusNotification("tc.status.enabled");
 
 		// register plugin settings
 		AssetManager.loadIconFromPlugin(this, "oz-discord-connect");
@@ -191,12 +191,12 @@ class DiscordConnectRuntime extends Plugin {
 
 	private void openPluginMenu(Player player) {
 		List<MenuItem> items = new ArrayList<>();
-		items.add(new MenuItem("oz-discord-connect", t.get("TC_MENU_INFO_STATUS", player), p -> {
+		items.add(new MenuItem("oz-discord-connect", t.get("tc.menu.info.status", player), p -> {
 			p.hideRadialMenu(true);
 			PluginInfoStatusProviders.show(p, name);
 		}));
 		if (s.joinDiscord != null && !s.joinDiscord.isBlank())
-			items.add(new MenuItem("discord-logo", t.get("TC_MENU_JOIN_DISCORD", player),
+			items.add(new MenuItem("discord-logo", t.get("tc.menu.join.discord", player),
 					p -> p.connectToDiscord("https://discord.gg/" + s.joinDiscord)));
 		items.add(MenuItem.closeMenu(player));
 		PluginMenuManager.showMenu(player, items);
@@ -273,7 +273,7 @@ class DiscordConnectRuntime extends Plugin {
 			PluginShortcutVisibility.unregister(name);
 			PluginInfoStatusProviders.unregisterProvider(name);
 		}
-		this.statusNotification("TC_STATUS_DISABLED");
+		this.statusNotification("tc.status.disabled");
 		stopDiscordClient();
 		shutdownDiscordTransport();
 		closeWebhookHttpClient();
@@ -368,7 +368,7 @@ class DiscordConnectRuntime extends Plugin {
 			// Invalid number of arguments (0)
 			if (cmdParts.length < 2) {
 				player.sendTextMessage(c.error + this.getName() + ":>" + c.text
-						+ t.get("TC_MSG_CMD_ERR_ARGUMENTS", lang).replace("PH_CMD", c.error + command + c.text)
+						+ t.get("tc.msg.cmd.err.arguments", lang).replace("PH_CMD", c.error + command + c.text)
 								.replace("PH_COMMAND_HELP", c.command + "/" + pluginCMD + " help\n" + c.text));
 				return;
 			}
@@ -380,20 +380,20 @@ class DiscordConnectRuntime extends Plugin {
 					boolean canTriggerRestart = s.allowRestart && (player.isAdmin() || (!s.restartAdminOnly
 							&& player.getTotalPlayTime() > s.restartMinimumTime && s.restartMinimumTime > 0));
 					if (canTriggerRestart) {
-						String msgDC = t.get("TC_DC_SHUTDOWN", s.botLang).replace("PH_PLAYER", player.getName());
+						String msgDC = t.get("tc.dc.shutdown", s.botLang).replace("PH_PLAYER", player.getName());
 						this.sendDiscordStatusMessage(msgDC);
-						this.broadcastMessage("TC_BC_SHUTDOWN", player.getName());
+						this.broadcastMessage("tc.bc.shutdown", player.getName());
 						flagRestart = true;
 					} else {
 						player.sendTextMessage(
-								c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_RESTART_NOTALLOWED", lang));
+								c.error + this.getName() + ":>" + c.text + t.get("tc.cmd.restart.notallowed", lang));
 					}
 					break;
 				case "info":
 					PluginInfoStatusProviders.show(player, name);
 					break;
 				case "help":
-					String helpMessage = t.get("TC_CMD_HELP", lang)
+					String helpMessage = t.get("tc.cmd.help", lang)
 							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
 							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
 							.replace("PH_CMD_RESTART", c.command + "/" + pluginCMD + " restart" + c.text)
@@ -446,7 +446,7 @@ class DiscordConnectRuntime extends Plugin {
 								Player onlinePlayer = Server.getPlayerByDbID(playerDbId);
 								if (onlinePlayer != null) {
 									onlinePlayer.sendTextMessage(
-											c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
+											c.okay + this.getName() + ":>" + c.text + t.get("tc.support.success", lang));
 								}
 							});
 						} catch (Exception e) {
@@ -456,15 +456,15 @@ class DiscordConnectRuntime extends Plugin {
 					});
 				} else {
 					this.sendDiscordSupportMessage("SupportTicket", supportMessage, de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player));
-					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_SUCCESS", lang));
+					player.sendTextMessage(c.okay + this.getName() + ":>" + c.text + t.get("tc.support.success", lang));
 				}
 			} else {
 				player.sendTextMessage(
-						c.error + this.getName() + ":>" + c.text + t.get("TC_SUPPORT_NOTAVAILABLE", lang));
+						c.error + this.getName() + ":>" + c.text + t.get("tc.support.notavailable", lang));
 			}
 		} else if (command.equals("/joinDiscord")) {
 			if (s.joinDiscord.isEmpty()) {
-				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("TC_CMD_JOINDISCORD_NA", lang));
+				player.sendTextMessage(c.error + this.getName() + ":>" + c.text + t.get("tc.cmd.joindiscord.na", lang));
 			} else {
 				player.connectToDiscord("https://discord.gg/" + s.joinDiscord);
 			}
@@ -586,7 +586,7 @@ class DiscordConnectRuntime extends Plugin {
 		if (s.sendPluginWelcome) {
 			Player player = event.getPlayer();
 			String lang = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
-			player.sendTextMessage(t.get("TC_MSG_PLUGIN_WELCOME", lang)
+			player.sendTextMessage(t.get("tc.msg.plugin.welcome", lang)
 					.replace("PH_PLUGIN_NAME", getDescription("name"))
 					.replace("PH_PLUGIN_CMD", pluginCMD)
 					.replace("PH_PLUGIN_VERSION", getDescription("version")));
@@ -606,11 +606,11 @@ class DiscordConnectRuntime extends Plugin {
 		if (flagRestart) {
 			int playersLeft = Server.getPlayerCount() - 1;
 			if (playersLeft == 0) {
-				this.sendDiscordStatusMessage(t.get("TC_RESTART_PLAYER_LAST", s.botLang));
+				this.sendDiscordStatusMessage(t.get("tc.restart.player.last", s.botLang));
 				updateDiscordActivity("Restarting...");
 				restart();
 			} else if (playersLeft > 1) {
-				this.broadcastMessage("TC_BC_PLAYER_REMAIN", playersLeft);
+				this.broadcastMessage("tc.bc.player.remain", playersLeft);
 			}
 		}
 	}
@@ -1015,17 +1015,17 @@ class DiscordConnectRuntime extends Plugin {
 					int playerNum = Server.getPlayerCount();
 					if (playerNum > 0) {
 						logger().info("Setting restart flag for scheduled server-restart");
-						broadcastMessage("TC_RS_SCHEDULE_INFO");
+						broadcastMessage("tc.rs.schedule.info");
 						setFlagRestart(true);
 						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_FLAG");
+							DiscordConnect.instance.statusNotification("tc.status.restart.flag");
 						if (s.forceRestartAfter > 0) {
-							broadcastMessage("TC_RS_SCHEDULE_WARN", s.forceRestartAfter);
+							broadcastMessage("tc.rs.schedule.warn", s.forceRestartAfter);
 						}
 					} else {
 						logger().info("Restarting server now (scheduled)");
 						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_SCHEDULED");
+							DiscordConnect.instance.statusNotification("tc.status.restart.scheduled");
 
 						restart();
 					}
@@ -1122,11 +1122,10 @@ class DiscordConnectRuntime extends Plugin {
 
 	public void onSettingsChanged(Path settingsPath) {
 		if (s.reportSettingsChanged) {
-			this.sendDiscordStatusMessage(t.get("TC_UPDATE_SETTINGS", s.botLang));
+			this.sendDiscordStatusMessage(t.get("tc.update.settings", s.botLang));
 		}
 		s.initSettings(settingsPath.toString());
 		this.initialize();
-		logger().setLevel(s.logLevel);
 	}
 
 	public static void forceRestart() {
@@ -1137,7 +1136,7 @@ class DiscordConnectRuntime extends Plugin {
 		}
 		((DiscordConnectRuntime) DiscordConnect.instance).updateDiscordActivity("Restarting soon...");
 
-		DiscordConnect.instance.statusNotification("TC_STATUS_RESTART_FORCED");
+		DiscordConnect.instance.statusNotification("tc.status.restart.forced");
 		DiscordConnect.instance.executeDelayed(5, () -> {
 			if (s.useShutdownNotRestart)
 				Server.sendInputCommand("shutdown");

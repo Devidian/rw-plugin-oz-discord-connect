@@ -1,0 +1,485 @@
+{
+  "\n•": "Wenn der DiscordBot in den settings.properties aktiviert wurde, kann ein Admin\nSupport nachrichten an einen oder alle Spieler aus dem Discord schreiben.\n• Es kann ein Kanal definiert werden für Discord um vom Discord aus in den lokalen\nchat im Spiel schreiben zu können.\n• Wenn \"+screen\" oder \"+s\" als Chat-Token geschrieben wird, wird ein Screenshot zum Discord-Kanal gesendet.\n• Wenn \"+screennogui\" oder \"+sng\" als Chat-Token geschrieben wird, wird ein Screenshot ohne Interface zum Discord-Kanal gesendet.\n• Wenn \"+tp\" oder \"+t\" als Chat-Token geschrieben wird, werden deine Koordinaten in den chat und zum Discord gesendet.\n\nZusätzlich gibt es ein paar unterstützende Admin-Befehle.\nFür mehr Informationen tippe PH_CMD_HELP\n",
+  "tc": {
+    "bc": {
+      "banned": "PH_DISCORDUSER hat den Spieler PH_PLAYER gebannt, Grund: PH_REASON",
+      "group": "PH_DISCORDUSER changed permission-group of PH_PLAYER to PH_GROUP",
+      "kicked": "PH_DISCORDUSER hat den Spieler PH_PLAYER gekickt, Grund: PH_REASON",
+      "player": {
+        "remain": "PH_NUMBER Spieler verbleibend. Server wartet mit dem herunterfahren bis der letzte Spieler den Server verlassen hat!"
+      },
+      "restart": "PH_DISCORDUSER hat einen Neustart eingeleitet. Der Server wird heruntergefahren wenn der letzte Spieler den Server verlassen hat!",
+      "shutdown": "PH_PLAYER hat einen Neustart eingeleitet. Der Server wird heruntergefahren wenn der letzte Spieler den Server verlassen hat!"
+    },
+    "cmd": {
+      "err": {
+        "admin": {
+          "only": "Der Befehl `PH_CMD` darf nur von Administratoren ausgführt werden!"
+        },
+        "argument": {
+          "length": "Falsche Anzahl an Argumenten für `PH_CMD`!"
+        },
+        "ban": {
+          "arguments": "Falsche Anzahl an Argumenten, verwende bitte `/ban SpielerId [dauer in sekunden?] [grund?]`"
+        },
+        "disabled": "Der Befehl `PH_CMD` wurde deaktiviert!",
+        "group": {
+          "arguments": "Falsche Anzahl an Argumenten, verwende bitte `/group SpielerId GRUPPE`"
+        },
+        "illegal": {
+          "arguments": "Ungültiger Argumentwert `PH_ARGUMENT` für `PH_CMD`, gültige Werte sind:\nPH_ARGS_AVAILABLE"
+        },
+        "kick": {
+          "arguments": "Falsche Anzahl an Argumenten, verwende bitte `/kick SpielerId [grund?]`"
+        },
+        "nolevel": "Dem Befehl `PH_CMD` wurde kein Level zugewiesen!",
+        "player": {
+          "offline": "Der Spieler mit dem Namen PH_PLAYER ist nicht online."
+        },
+        "support": {
+          "arguments": "Falsche Anzahl an Argumenten, verwende bitte `/support SpielerId TEXT...`"
+        },
+        "unknown": "Der Befehl `PH_CMD` ist unbekannt!"
+      },
+      "help": "Plugin Verwendung\nPH_CMD_SUPPORT  | sende eine Nachricht an den support-discord-channel\nPH_CMD_JOIN     | trete dem Discord Server bei\nPH_CMD_RESTART  | startet den Server neu sobald alle Spieler den Server verlassen haben\nPH_CMD_HELP     | listet alle verfügbaren Kommandos aufs\nPH_CMD_INFO     | gibt die Beschreibung des Plugins aus\nPH_CMD_STATUS   | gibt den aktuellen Status des Plugins aus\n",
+      "info": "BESCHREIBUNG\nDieses Plugin dient dazu einen (diesen) RisingWorld Server in Discord zu integrieren.\nEs werden 4 Arten von Nachrichten gesendet: \n1. Support Nachrichten die mit dem Befehl PH_CMD_SUPPORT versendet wurden\n2. Nachrichten aus dem lokalen Chat\n3. Server Status Nachrichten (plugin on/off, player dis-connected, files changed)\n4. (Falls aktiviert) Meldungen über getötete Reittiere und nicht feindliche tiere sowie\ndas Entfernen oder Zerstören von aufhebbaren Objekten (z.b. Werkbank)",
+      "joindiscord": {
+        "na": "/joinDiscord nicht konfiguriert"
+      },
+      "out": {
+        "banned": {
+          "list": "Aktuell sind folgende Spieler gebannt:"
+        },
+        "group": "Rechtegruppe von PH_PLAYER wurde auf PH_GROUP gesetzt",
+        "online": {
+          "list": "Aktuell sind folgende Spieler auf dem Server:",
+          "nobody": "Keine Spieler auf dem Server!"
+        },
+        "restart": {
+          "delay": "PH_PLAYERS Spieler online, Neustart wird später ausgeführt",
+          "now": "Kein Spieler online, Server wird heruntergefahren"
+        },
+        "time": "Die aktuelle Zeit im Spiel ist PH_TIME im PH_SEASON Jahr PH_YEAR Tag PH_DAY",
+        "weather": "Das aktuelle Wetter auf dem Server ist PH_WEATHER"
+      },
+      "restart": {
+        "notallowed": "Du hast nicht das Recht den Server neu zu starten"
+      },
+      "status": "Plugin Status\nPlugin version: PH_VERSION\nInstallierte Sprachen: PH_LANG_AVAILABLE\nDeine Sprache: PH_LANGUAGE\nVerwendete Sprache: PH_USEDLANG\n"
+    },
+    "dc": {
+      "shutdown": "PH_PLAYER hat einen Neustart eingeleitet. Der Server wird heruntergefahren wenn der letzte Spieler den Server verlassen hat!"
+    },
+    "discord": {
+      "connect": {
+        "info": {
+          "panel": {
+            "info": "\u003cb\u003ePH_PLUGIN_NAME\u003c/b\u003e\nVersion: PH_VERSION\nBefehl: /PH_PLUGIN_CMD\n\nDiscord Connect verbindet Ingame-Chat, Support, Statusmeldungen, Neustartabläufe und Discord-Admin-Kommandos.",
+            "status": "\u003cb\u003eDiscord Connect Status\u003c/b\u003e\nBot aktiv: PH_BOT_ENABLED\nChat weiterleiten: PH_POST_CHAT\nSupport weiterleiten: PH_POST_SUPPORT\nServerstatus melden: PH_REPORT_STATUS\nSettings-Änderungen melden: PH_REPORT_SETTINGS\nJar-Änderungen melden: PH_REPORT_JAR\nNeustart erlaubt: PH_ALLOW_RESTART\nZeitgesteuerter Neustart: PH_RESTART_TIMED\nJoin-Discord konfiguriert: PH_JOIN_DISCORD\nSprache: PH_LANGUAGE\nVerwendete Sprache: PH_USEDLANG\nInstallierte Sprachen: PH_LANG_AVAILABLE"
+          }
+        }
+      },
+      "help": {
+        "short": "Dieses Plugin verwendet slash Befehle, tippe `/` um zu beginnen.."
+      }
+    },
+    "label": {
+      "discord": {
+        "connect": {
+          "shortcut": "Discord-Connect-Shortcut in /ozt und Inventar anzeigen"
+        }
+      }
+    },
+    "menu": {
+      "info": {
+        "status": "Info / Status"
+      },
+      "join": {
+        "discord": "Discord beitreten"
+      }
+    },
+    "msg": {
+      "cmd": {
+        "err": {
+          "arguments": "Falsche Argumente"
+        }
+      },
+      "plugin": {
+        "welcome": "➡️ \u003ccolor\u003d#F00000\u003ePH_PLUGIN_NAME\u003c/color\u003e | \u003ccolor\u003d#F0F000\u003evPH_PLUGIN_VERSION\u003c/color\u003e | \u003ccolor\u003d#C0C0C0\u003e/PH_PLUGIN_CMD\u003c/color\u003e | geladen!"
+      }
+    },
+    "restart": {
+      "player": {
+        "last": "Der letzte Spieler hat den Server verlassen, Server wird heruntergefahren"
+      }
+    },
+    "rs": {
+      "schedule": {
+        "info": "Dieser Server wurde für einen geplanten neustart markiert, bitte ausloggen!",
+        "warn": "Achtung: Der Server wird nach PH_NUMBER Minuten spätestens herunterfahren wenn noch Spieler online sind!"
+      }
+    },
+    "season": {
+      "autumn": "Herbst",
+      "spring": "Frühling",
+      "summer": "Sommer",
+      "winter": "Winter"
+    },
+    "setting": {
+      "addteleportcommand": {
+        "desc": "Fügt Supportmeldungen einen Teleportbefehl hinzu, wenn Koordinaten verfügbar sind.",
+        "label": "Support-Teleportbefehl"
+      },
+      "allowrestart": {
+        "desc": "Aktiviert Ingame-Neustartbefehle.",
+        "label": "Neustart erlauben"
+      },
+      "allowscreenshots": {
+        "desc": "Erlaubt Spielern, Screenshots über Chat-Kürzel zu posten.",
+        "label": "Screenshots erlauben"
+      },
+      "botadmins": {
+        "desc": "Kommagetrennte Discord-Benutzer, die sichere Befehle ausführen dürfen.",
+        "label": "Bot-Admins"
+      },
+      "botchatchannelname": {
+        "desc": "Discord-Kanalname, aus dem Bot-Chatnachrichten ingame übernommen werden.",
+        "label": "Bot-Chatkanal"
+      },
+      "botcmdbanned": {
+        "desc": "Zugriffsstufe für den Gebannte-Befehl.",
+        "label": "Befehl: Gebannte"
+      },
+      "botcmdban": {
+        "desc": "Zugriffsstufe für den Ban-Befehl.",
+        "label": "Befehl: Ban"
+      },
+      "botcmdbc": {
+        "desc": "Zugriffsstufe für den bc-Befehl.",
+        "label": "Befehl: bc"
+      },
+      "botcmdbroadcast": {
+        "desc": "Zugriffsstufe für den Broadcast-Befehl.",
+        "label": "Befehl: Broadcast"
+      },
+      "botcmdgroup": {
+        "desc": "Zugriffsstufe für den Gruppen-Befehl.",
+        "label": "Befehl: Gruppe"
+      },
+      "botcmdhelp": {
+        "desc": "Zugriffsstufe für den Hilfe-Befehl.",
+        "label": "Befehl: Hilfe"
+      },
+      "botcmdkick": {
+        "desc": "Zugriffsstufe für den Kick-Befehl.",
+        "label": "Befehl: Kick"
+      },
+      "botcmdmkadmin": {
+        "desc": "Zugriffsstufe für den Admin-machen-Befehl.",
+        "label": "Befehl: Admin machen"
+      },
+      "botcmdonline": {
+        "desc": "Zugriffsstufe für den Online-Befehl.",
+        "label": "Befehl: Online"
+      },
+      "botcmdreloadplugins": {
+        "desc": "Zugriffsstufe für den Plugins-neu-laden-Befehl.",
+        "label": "Befehl: Plugins neu laden"
+      },
+      "botcmdrestart": {
+        "desc": "Zugriffsstufe für den Neustart-Befehl.",
+        "label": "Befehl: Neustart"
+      },
+      "botcmdsethealth": {
+        "desc": "Zugriffsstufe für den Gesundheit-setzen-Befehl.",
+        "label": "Befehl: Gesundheit setzen"
+      },
+      "botcmdsethunger": {
+        "desc": "Zugriffsstufe für den Hunger-setzen-Befehl.",
+        "label": "Befehl: Hunger setzen"
+      },
+      "botcmdsetthirst": {
+        "desc": "Zugriffsstufe für den Durst-setzen-Befehl.",
+        "label": "Befehl: Durst setzen"
+      },
+      "botcmdsettime": {
+        "desc": "Zugriffsstufe für den Zeit-setzen-Befehl.",
+        "label": "Befehl: Zeit setzen"
+      },
+      "botcmdsetweather": {
+        "desc": "Zugriffsstufe für den Wetter-setzen-Befehl.",
+        "label": "Befehl: Wetter setzen"
+      },
+      "botcmdsupport": {
+        "desc": "Zugriffsstufe für den Support-Befehl.",
+        "label": "Befehl: Support"
+      },
+      "botcmdtime": {
+        "desc": "Zugriffsstufe für den Zeit-Befehl.",
+        "label": "Befehl: Zeit"
+      },
+      "botcmdtptp": {
+        "desc": "Zugriffsstufe für den Zu-Spieler-teleportieren-Befehl.",
+        "label": "Befehl: Zu Spieler teleportieren"
+      },
+      "botcmdunadmin": {
+        "desc": "Zugriffsstufe für den Admin-entziehen-Befehl.",
+        "label": "Befehl: Admin entziehen"
+      },
+      "botcmdunban": {
+        "desc": "Zugriffsstufe für den Entbannen-Befehl.",
+        "label": "Befehl: Entbannen"
+      },
+      "botcmdversion": {
+        "desc": "Zugriffsstufe für den Version-Befehl.",
+        "label": "Befehl: Version"
+      },
+      "botcmdweather": {
+        "desc": "Zugriffsstufe für den Wetter-Befehl.",
+        "label": "Befehl: Wetter"
+      },
+      "botcmdyell": {
+        "desc": "Zugriffsstufe für den Yell-Befehl.",
+        "label": "Befehl: Yell"
+      },
+      "botcommands": {
+        "desc": "Zugriff auf Discord-Bot-Befehle: 0 deaktiviert, 1 alle, 2 nur Admins.",
+        "label": "Bot-Befehle"
+      },
+      "botenable": {
+        "desc": "Aktiviert den Discord-Bot.",
+        "label": "Bot aktiviert"
+      },
+      "botlang": {
+        "desc": "Sprache für Discord-Bot-Befehle, da der Bot sie nicht automatisch bestimmen kann.",
+        "label": "Bot-Sprache"
+      },
+      "botsecure": {
+        "desc": "Beschränkt sichere Bot-Befehle auf konfigurierte Admins.",
+        "label": "Sichere Bot-Befehle"
+      },
+      "bottoken": {
+        "desc": "Discord-Bot-Token.",
+        "label": "Bot-Token"
+      },
+      "bot": {
+        "desc": "Discord-Bot-Identität, Zugriff und Befehlsverhalten.",
+        "label": "Discord-Bot"
+      },
+      "chatchannelid": {
+        "desc": "Discord-Kanal-ID für Chatmeldungen.",
+        "label": "Chatkanal"
+      },
+      "chatformat": {
+        "desc": "Formatierung von Ingame- und Discord-Chat.",
+        "label": "Chatformat"
+      },
+      "colorizechat": {
+        "desc": "Aktiviert farbige Ingame-Chatformatierung.",
+        "label": "Chat einfärben"
+      },
+      "colorlocaladmin": {
+        "desc": "RichText-Farbe für lokale Admin-Nachrichten.",
+        "label": "Lokale Admin-Farbe"
+      },
+      "colorlocaldiscord": {
+        "desc": "RichText-Farbe für lokale Nachrichten aus Discord.",
+        "label": "Lokale Discord-Farbe"
+      },
+      "colorlocalother": {
+        "desc": "RichText-Farbe für andere lokale Chatnachrichten.",
+        "label": "Lokale Fremdfarbe"
+      },
+      "colorlocalself": {
+        "desc": "RichText-Farbe für eigene lokale Chatnachrichten.",
+        "label": "Lokale Eigenfarbe"
+      },
+      "colorsupport": {
+        "desc": "RichText-Farbe für Supportmeldungen.",
+        "label": "Support-Farbe"
+      },
+      "defaultchatprefix": {
+        "desc": "Präfix für Ingame-Chatnachrichten.",
+        "label": "Standard-Chatpräfix"
+      },
+      "discordchatsyntax": {
+        "desc": "Format für Chatnachrichten, die an Discord gesendet werden.",
+        "label": "Discord-Chat-Syntax"
+      },
+      "eventchannelid": {
+        "desc": "Discord-Kanal-ID für Ereignismeldungen.",
+        "label": "Ereigniskanal"
+      },
+      "forcerestartafter": {
+        "desc": "Minuten nach Neustartanforderung, bevor ein Neustart erzwungen wird; 0 deaktiviert erzwungene Neustarts.",
+        "label": "Neustart erzwingen nach"
+      },
+      "general": {
+        "desc": "Protokollierung, Reload, Willkommens- und Einladungsverhalten.",
+        "label": "Allgemein"
+      },
+      "joindiscord": {
+        "desc": "Text oder URL für die Discord-Einladung.",
+        "label": "Join-Discord-Text"
+      },
+      "loglevel": {
+        "desc": "Steuert den Detailgrad der DiscordConnect-Protokollierung.",
+        "label": "Log-Level"
+      },
+      "maxscreenwidth": {
+        "desc": "Maximale Screenshot-Breite in Pixeln.",
+        "label": "Maximale Screenshot-Breite"
+      },
+      "overrideavatar": {
+        "desc": "Verwendet Spieleravatare für Webhook-Nachrichten.",
+        "label": "Avatar überschreiben"
+      },
+      "postchat": {
+        "desc": "Leitet Ingame-Chat an Discord weiter.",
+        "label": "Chat posten"
+      },
+      "postsupport": {
+        "desc": "Leitet Supportmeldungen an Discord weiter.",
+        "label": "Support posten"
+      },
+      "reloadonchange": {
+        "desc": "Dokumentiert, dass DiscordConnect-Einstellungen neu geladen werden, wenn sich settings.properties ändert.",
+        "label": "Bei Änderung neu laden"
+      },
+      "reportjarchanged": {
+        "desc": "Meldet Plugin-Jar-Änderungen an Discord.",
+        "label": "Jar-Änderungen melden"
+      },
+      "reportserverstatus": {
+        "desc": "Meldet Serverstatus-Ereignisse an Discord.",
+        "label": "Serverstatus melden"
+      },
+      "reportsettingschanged": {
+        "desc": "Meldet Einstellungsänderungen an Discord.",
+        "label": "Einstellungsänderungen melden"
+      },
+      "restartadminonly": {
+        "desc": "Beschränkt Änderungen am Neustart-Flag auf Admins.",
+        "label": "Neustart nur für Admins"
+      },
+      "restartminimumtime": {
+        "desc": "Erforderliche Mindestspielzeit in Sekunden, um einen Neustart auszulösen.",
+        "label": "Mindestzeit für Neustart"
+      },
+      "restarttimed": {
+        "desc": "Aktiviert die Verarbeitung geplanter Neustarts.",
+        "label": "Geplanter Neustart"
+      },
+      "restarttimes": {
+        "desc": "Geplante Neustartzeiten, getrennt durch |.",
+        "label": "Neustartzeiten"
+      },
+      "restart": {
+        "desc": "Ingame- und geplanter Neustart.",
+        "label": "Neustart"
+      },
+      "routing": {
+        "desc": "Routing für Discord-Chat, Support und Status.",
+        "label": "Nachrichtenrouting"
+      },
+      "screenshots": {
+        "desc": "Weiterleitungsverhalten für Spieler-Screenshots.",
+        "label": "Bildschirmfotos"
+      },
+      "sendpluginwelcome": {
+        "desc": "Zeigt eine kurze DiscordConnect-Nachricht, wenn ein Spieler beitritt.",
+        "label": "Willkommensnachricht"
+      },
+      "showgroup": {
+        "desc": "Fügt Gruppeninformationen in Chatnachrichten ein.",
+        "label": "Gruppe anzeigen"
+      },
+      "statuschannelid": {
+        "desc": "Discord-Kanal-ID für Statusmeldungen.",
+        "label": "Statuskanal"
+      },
+      "statususername": {
+        "desc": "Webhook-Benutzername für Statusmeldungen.",
+        "label": "Status-Benutzername"
+      },
+      "supportchannelid": {
+        "desc": "Discord-Kanal-ID für Supportmeldungen.",
+        "label": "Supportkanal"
+      },
+      "supportscreenshot": {
+        "desc": "Fügt Supportmeldungen standardmäßig Screenshots hinzu.",
+        "label": "Support-Screenshots"
+      },
+      "useservername": {
+        "desc": "Verwendet den Servernamen für Status-Webhook-Nachrichten.",
+        "label": "Servernamen verwenden"
+      },
+      "useshutdownnotrestart": {
+        "desc": "Sendet bei Aktivierung Herunterfahren statt Neustart.",
+        "label": "Herunterfahren statt Neustart"
+      },
+      "webhookchaturl": {
+        "desc": "Webhook-URL für Chatmeldungen.",
+        "label": "Chat-Webhook"
+      },
+      "webhookeventurl": {
+        "desc": "Webhook-URL für Ereignismeldungen.",
+        "label": "Ereignis-Webhook"
+      },
+      "webhookstatusurl": {
+        "desc": "Webhook-URL für Statusmeldungen.",
+        "label": "Status-Webhook"
+      },
+      "webhooksupporturl": {
+        "desc": "Webhook-URL für Supportmeldungen.",
+        "label": "Support-Webhook"
+      },
+      "webhooks": {
+        "desc": "Discord-Webhook-URLs und direkte Kanalziele.",
+        "label": "Webhooks und Kanäle"
+      }
+    },
+    "status": {
+      "disabled": "PH_PLUGIN_NAME ist nun deaktiviert [Server stop] Version: PH_PLUGIN_VERSION",
+      "enabled": "PH_PLUGIN_NAME ist nun aktiviert [Server start] Version: PH_PLUGIN_VERSION",
+      "restart": {
+        "flag": "PH_PLUGIN_NAME Neustart Flag gesetzt, Server wird neu gestartet wenn alle Spieler (PH_PLAYER_COUNT) den Server verlassen haben!",
+        "forced": "PH_PLUGIN_NAME erzwungener Neustart jetzt, Spieler verbleibend: PH_PLAYER_COUNT!",
+        "scheduled": "PH_PLUGIN_NAME geplanter Neustart jetzt!"
+      }
+    },
+    "support": {
+      "notavailable": "Discord Support nicht verfügbar!",
+      "success": "Dein Support Ticket wurde an Discord gesendet!"
+    },
+    "update": {
+      "settings": "settings.properties wurde geändert, lade Einstellungen erneut"
+    },
+    "weather": {
+      "blizzard": "Schneesturm",
+      "breeze": "Brise",
+      "clear": "Klar",
+      "cold": "Kalt",
+      "coldfog": "Kalter Nebel",
+      "default": "Standard",
+      "densefog": "Dichter Nebel",
+      "drythunder": "Trockenes Gewitter",
+      "farthunder": "Fernes Gewitter",
+      "fog": "Nebel",
+      "heavyrain": "Starker Regen",
+      "heavysnow": "Starker Schneefall",
+      "heavythunder": "Schweres Gewitter",
+      "hurricane": "Hurrikan",
+      "lightrain": "Leichter Regen",
+      "lightsnow": "Leichter Schneefall",
+      "overcast": "Bedeckt",
+      "rain": "Regen",
+      "snow": "Schnee",
+      "storm": "Sturm",
+      "sunnysnow": "Sonnig mit Schnee",
+      "thaw": "Tauwetter",
+      "thunder": "Gewitter",
+      "wind": "Wind"
+    }
+  }
+}

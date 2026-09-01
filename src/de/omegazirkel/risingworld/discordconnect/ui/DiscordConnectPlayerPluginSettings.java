@@ -30,7 +30,7 @@ public class DiscordConnectPlayerPluginSettings extends PlayerPluginSettings {
 
             protected OZUIElement shortcutSetting(Player uiPlayer) {
                 OZUIElement element = defaultSettingsContainer();
-                element.addChild(defaultSettingsLabel(t().get("TC_LABEL_DISCORD_CONNECT_SHORTCUT", uiPlayer)));
+                element.addChild(defaultSettingsLabel(t().get("tc.label.discord.connect.shortcut", uiPlayer)));
                 boolean visible = shortcutVisible(uiPlayer);
                 element.addChild(switchButtons(uiPlayer, visible, event -> {
                     if (DiscordConnect.playerSettings != null) {

@@ -18,6 +18,7 @@ import de.omegazirkel.risingworld.DiscordConnect;
 import de.omegazirkel.risingworld.tools.OZLogger;
 import de.omegazirkel.risingworld.tools.settings.AdminSettingsEntry;
 import de.omegazirkel.risingworld.tools.settings.AdminSettingsType;
+import de.omegazirkel.risingworld.tools.settings.JsonSettingsFile;
 import de.omegazirkel.risingworld.tools.settings.SettingsFileEditor;
 
 public class PluginSettings {
@@ -30,8 +31,6 @@ public class PluginSettings {
 	}
 
 	// Settings
-	public String logLevel = "ALL";
-	public boolean reloadOnChange = true;
 	public String joinDiscord = "";
 	public boolean botEnable = false;
 	public boolean sendPluginWelcome = false;
@@ -117,31 +116,24 @@ public class PluginSettings {
 	}
 
 	public void initSettings() {
-		initSettings((plugin.getPath() != null ? plugin.getPath() : ".") + "/settings.properties");
+		initSettings(JsonSettingsFile.worldSettingsFile(plugin.getPath() != null ? plugin.getPath() : ".").toString());
 	}
 
 	public void initSettings(String filePath) {
 		Path settingsFile = Paths.get(filePath);
-		Path defaultSettingsFile = settingsFile.resolveSibling("settings.default.properties");
+		Path defaultSettingsFile = settingsFile.resolveSibling("settings.default.json");
+		Path legacySettingsFile = settingsFile.resolveSibling("settings.properties");
 
 		try {
-			if (Files.notExists(settingsFile) && Files.exists(defaultSettingsFile)) {
-				logger().info("settings.properties not found, copying from settings.default.properties...");
-				Files.copy(defaultSettingsFile, settingsFile);
-			}
-
-			Properties settings = new Properties();
-			if (Files.exists(settingsFile)) {
-				try (FileInputStream in = new FileInputStream(settingsFile.toFile())) {
-					settings.load(new InputStreamReader(in, "UTF8"));
-				}
-			} else {
+			if (JsonSettingsFile.migrateLegacyProperties(legacySettingsFile, settingsFile)) logger().info("Migrated legacy settings.properties to " + settingsFile.getFileName());
+			if (Files.notExists(settingsFile) && Files.exists(defaultSettingsFile)) JsonSettingsFile.writeFlatAtomically(settingsFile, JsonSettingsFile.loadFlat(defaultSettingsFile));
+			JsonSettingsFile.normalizePaths(settingsFile);
+			Properties settings = loadSettings(settingsFile);
+			if (settings.isEmpty()) {
 				logger().warn(
 						"⚠️ Neither settings.properties nor settings.default.properties found. Using default values.");
 			}
 			// fill global values
-			logLevel = settings.getProperty("logLevel", "ALL");
-			reloadOnChange = settings.getProperty("reloadOnChange", "true").contentEquals("true");
 			postChat = settings.getProperty("postChat", "false").contentEquals("true");
 			joinDiscord = settings.getProperty("joinDiscord", "");
 			overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
@@ -253,8 +245,6 @@ public class PluginSettings {
 			// logger().info("Will send status to Discord: " + String.valueOf(postStatus));
 			logger().info("Will send support tickets to Discord: " + String.valueOf(postSupport));
 			logger().info("Sending welcome message on login is: " + String.valueOf(sendPluginWelcome));
-			logger().info("Loglevel is set to " + logLevel);
-			logger().setLevel(logLevel);
 
 		} catch (IOException ex) {
 			logger().error("IOException on initSettings: " + ex.getMessage());
@@ -286,12 +276,7 @@ public class PluginSettings {
 
 	public java.util.List<AdminSettingsEntry> adminSettingsEntries() {
 		return java.util.List.of(
-				AdminSettingsEntry.group("general", "General", "Logging, reload, welcome, and invite behavior."),
-				entry("logLevel", "Log level", "Controls DiscordConnect logging verbosity.", logLevel, "ALL",
-						AdminSettingsType.STRING),
-				entry("reloadOnChange", "Reload on change",
-						"Documents that DiscordConnect settings reload when settings.properties changes.",
-						reloadOnChange, "true", AdminSettingsType.BOOLEAN),
+				AdminSettingsEntry.group("general", "General", "Welcome and invite behavior."),
 				entry("sendPluginWelcome", "Welcome message",
 						"Shows a short DiscordConnect message when a player joins.", sendPluginWelcome, "false",
 						AdminSettingsType.BOOLEAN),
@@ -457,7 +442,7 @@ public class PluginSettings {
 				defaultValue,
 				type,
 				false,
-				newValue -> SettingsFileEditor.writeValue(settingsPath(), key, newValue));
+				newValue -> SettingsFileEditor.writeValue(settingsPath(), JsonSettingsFile.canonicalPath(key), newValue));
 	}
 
 	private AdminSettingsEntry readOnlyEntry(String key, String label, String description, Object value,
@@ -478,6 +463,17 @@ public class PluginSettings {
 	}
 
 	private Path settingsPath() {
-		return Paths.get((plugin.getPath() != null ? plugin.getPath() : ".") + "/settings.properties");
+		return JsonSettingsFile.worldSettingsFile(plugin.getPath() != null ? plugin.getPath() : ".");
+	}
+
+	private Properties loadSettings(Path file) throws IOException {
+		if (!file.getFileName().toString().endsWith(".properties")) {
+			Properties properties = JsonSettingsFile.loadProperties(file);
+			JsonSettingsFile.addCompatibilityAliases(properties);
+			return properties;
+		}
+		Properties properties = new Properties();
+		if (Files.exists(file)) try (FileInputStream input = new FileInputStream(file.toFile())) { properties.load(new InputStreamReader(input, "UTF8")); }
+		return properties;
 	}
 }

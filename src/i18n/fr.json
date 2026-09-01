@@ -1,0 +1,469 @@
+{
+  "tc": {
+    "bc": {
+      "banned": "PH_DISCORDUSER a banni le joueur PH_PLAYER, raison : PH_REASON",
+      "group": "PH_DISCORDUSER a changé le groupe d\u0027autorisations de PH_PLAYER en PH_GROUP",
+      "kicked": "PH_DISCORDUSER a expulsé le joueur PH_PLAYER, raison : PH_REASON",
+      "player": {
+        "remain": "Il reste PH_NUMBER joueur(s). Le serveur attendra le départ du dernier joueur avant de s\u0027arrêter !"
+      },
+      "restart": "PH_DISCORDUSER a lancé un redémarrage. Le serveur s\u0027arrêtera lorsque le dernier joueur aura quitté le serveur !",
+      "shutdown": "PH_PLAYER a lancé un redémarrage. Le serveur s\u0027arrêtera lorsque le dernier joueur aura quitté le serveur !"
+    },
+    "cmd": {
+      "err": {
+        "admin": {
+          "only": "La commande `PH_CMD` ne peut être exécutée que par des administrateurs !"
+        },
+        "argument": {
+          "length": "Nombre d\u0027arguments incorrect pour `PH_CMD` !"
+        },
+        "ban": {
+          "arguments": "Nombre d\u0027arguments incorrect, veuillez utiliser `/ban PlayerId [durée en secondes ?] [raison ?]`"
+        },
+        "disabled": "La commande `PH_CMD` a été désactivée !",
+        "group": {
+          "arguments": "Nombre d\u0027arguments incorrect, veuillez utiliser `/group PlayerId GROUP`"
+        },
+        "illegal": {
+          "arguments": "Valeur d\u0027argument invalide `PH_ARGUMENT` pour `PH_CMD`, les valeurs valides sont :\nPH_ARGS_AVAILABLE"
+        },
+        "kick": {
+          "arguments": "Nombre d\u0027arguments incorrect, veuillez utiliser `/kick PlayerId [raison ?]`"
+        },
+        "nolevel": "Aucun niveau n\u0027a été attribué à la commande `PH_CMD` !",
+        "player": {
+          "offline": "Le joueur nommé PH_PLAYER n\u0027est pas en ligne."
+        },
+        "support": {
+          "arguments": "Nombre d\u0027arguments incorrect, veuillez utiliser `/support PlayerId TEXT...`"
+        },
+        "unknown": "La commande `PH_CMD` est inconnue !"
+      },
+      "help": "Utilisation du plugin\nPH_CMD_SUPPORT  | envoyer un message au canal de support Discord\nPH_CMD_JOIN     | rejoindre le serveur Discord\nPH_CMD_RESTART  | redémarrer le serveur dès que tous les joueurs l\u0027ont quitté\nPH_CMD_HELP     | liste toutes les commandes disponibles\nPH_CMD_INFO     | affiche la description du plugin\nPH_CMD_STATUS   | affiche l\u0027état actuel du plugin\n",
+      "info": "DESCRIPTION\nCe plugin sert à intégrer un serveur RisingWorld dans Discord.\n4 types de messages sont envoyés :\n1. Les messages de support envoyés avec la commande PH_CMD_SUPPORT\n2. Les messages du chat local\n3. Les messages d\u0027état du serveur (plugin activé/désactivé, joueur connecté/déconnecté, fichiers modifiés)\n4. (Si activé) les notifications concernant les montures et animaux non hostiles tués, ainsi que\nla suppression ou destruction d\u0027objets récupérables (par ex. établi)\n\n• Si le bot Discord est activé dans settings.properties, un administrateur peut écrire\ndes messages de support depuis Discord à un ou à tous les joueurs.\n• Un canal Discord peut être défini pour écrire depuis Discord dans le chat local du jeu.\n• Si \"+screen\" (ou \"+s \") est écrit dans un message, une capture d\u0027écran est envoyée au canal Discord.\n• Si \"+screennogui\" (ou \"+sng \") est écrit dans un message, une capture d\u0027écran sans interface est envoyée au canal Discord.\n• Si \"+tp \" est écrit dans un message, vos coordonnées sont envoyées au chat et à Discord.\n\nEn plus, quelques commandes d\u0027administration utiles sont disponibles.\nPour plus d\u0027informations, tapez PH_CMD_HELP\n",
+      "joindiscord": {
+        "na": "/joinDiscord n\u0027est pas configuré"
+      },
+      "out": {
+        "banned": {
+          "list": "Les joueurs suivants sont actuellement bannis :"
+        },
+        "group": "Le groupe d\u0027autorisations de PH_PLAYER a été défini sur PH_GROUP",
+        "online": {
+          "list": "Les joueurs suivants sont actuellement sur le serveur :",
+          "nobody": "Aucun joueur sur le serveur !"
+        },
+        "restart": {
+          "delay": "PH_PLAYERS joueur(s) en ligne, le redémarrage sera exécuté plus tard",
+          "now": "Aucun joueur en ligne, le serveur va s\u0027arrêter"
+        },
+        "time": "L\u0027heure actuelle en jeu est PH_TIME dans PH_SEASON année PH_YEAR jour PH_DAY",
+        "weather": "La météo actuelle sur le serveur est PH_WEATHER"
+      },
+      "restart": {
+        "notallowed": "Vous n\u0027avez pas le droit de redémarrer le serveur"
+      },
+      "status": "État du plugin\nVersion du plugin : PH_VERSION\nLangues installées : PH_LANG_AVAILABLE\nVotre langue : PH_LANGUAGE\nLangue utilisée : PH_USEDLANG\n"
+    },
+    "dc": {
+      "shutdown": "PH_PLAYER a lancé un redémarrage. Le serveur s\u0027arrêtera lorsque le dernier joueur aura quitté le serveur !"
+    },
+    "discord": {
+      "help": {
+        "short": "Ce plugin utilise des commandes slash, tapez `/` pour commencer."
+      }
+    },
+    "menu": {
+      "info": {
+        "status": "Informations / état"
+      },
+      "join": {
+        "discord": "Rejoindre Discord"
+      }
+    },
+    "msg": {
+      "cmd": {
+        "err": {
+          "arguments": "Arguments incorrects"
+        }
+      },
+      "plugin": {
+        "welcome": "ℹ️ \u003ccolor\u003d#F00000\u003ePH_PLUGIN_NAME\u003c/color\u003e | \u003ccolor\u003d#F0F000\u003evPH_PLUGIN_VERSION\u003c/color\u003e | \u003ccolor\u003d#C0C0C0\u003e/PH_PLUGIN_CMD\u003c/color\u003e | loaded!"
+      }
+    },
+    "restart": {
+      "player": {
+        "last": "Le dernier joueur a quitté le serveur, le serveur va s\u0027arrêter"
+      }
+    },
+    "rs": {
+      "schedule": {
+        "info": "Ce serveur a été marqué pour un redémarrage planifié, veuillez vous déconnecter !",
+        "warn": "Attention : le serveur s\u0027arrêtera au plus tard dans PH_NUMBER minutes si des joueurs sont encore en ligne !"
+      }
+    },
+    "season": {
+      "autumn": "Automne",
+      "spring": "Printemps",
+      "summer": "Été",
+      "winter": "Hiver"
+    },
+    "setting": {
+      "addteleportcommand": {
+        "desc": "Ajoute une commande de téléportation aux messages de support lorsque des coordonnées sont disponibles.",
+        "label": "Commande de téléportation support"
+      },
+      "allowrestart": {
+        "desc": "Active les commandes de redémarrage en jeu.",
+        "label": "Autoriser le redémarrage"
+      },
+      "allowscreenshots": {
+        "desc": "Autorise les joueurs à publier des captures d\u0027écran via les raccourcis de chat.",
+        "label": "Autoriser les captures d\u0027écran"
+      },
+      "botadmins": {
+        "desc": "Utilisateurs Discord autorisés à exécuter des commandes sécurisées, séparés par des virgules.",
+        "label": "Admins du bot"
+      },
+      "botchatchannelname": {
+        "desc": "Nom du salon Discord dont les messages du bot sont repris en jeu.",
+        "label": "Salon de chat du bot"
+      },
+      "botcmdbanned": {
+        "desc": "Niveau d\u0027accès pour la commande bannis.",
+        "label": "Commande : bannis"
+      },
+      "botcmdban": {
+        "desc": "Niveau d\u0027accès pour la commande bannissement.",
+        "label": "Commande : bannissement"
+      },
+      "botcmdbc": {
+        "desc": "Niveau d\u0027accès pour la commande bc.",
+        "label": "Commande : bc"
+      },
+      "botcmdbroadcast": {
+        "desc": "Niveau d\u0027accès pour la commande diffusion.",
+        "label": "Commande : diffusion"
+      },
+      "botcmdgroup": {
+        "desc": "Niveau d\u0027accès pour la commande groupe.",
+        "label": "Commande : groupe"
+      },
+      "botcmdhelp": {
+        "desc": "Niveau d\u0027accès pour la commande aide.",
+        "label": "Commande : aide"
+      },
+      "botcmdkick": {
+        "desc": "Niveau d\u0027accès pour la commande expulsion.",
+        "label": "Commande : expulsion"
+      },
+      "botcmdmkadmin": {
+        "desc": "Niveau d\u0027accès pour la commande promouvoir admin.",
+        "label": "Commande : promouvoir admin"
+      },
+      "botcmdonline": {
+        "desc": "Niveau d\u0027accès pour la commande en ligne.",
+        "label": "Commande : en ligne"
+      },
+      "botcmdreloadplugins": {
+        "desc": "Niveau d\u0027accès pour la commande recharger plugins.",
+        "label": "Commande : recharger plugins"
+      },
+      "botcmdrestart": {
+        "desc": "Niveau d\u0027accès pour la commande redémarrage.",
+        "label": "Commande : redémarrage"
+      },
+      "botcmdsethealth": {
+        "desc": "Niveau d\u0027accès pour la commande définir santé.",
+        "label": "Commande : définir santé"
+      },
+      "botcmdsethunger": {
+        "desc": "Niveau d\u0027accès pour la commande définir faim.",
+        "label": "Commande : définir faim"
+      },
+      "botcmdsetthirst": {
+        "desc": "Niveau d\u0027accès pour la commande définir soif.",
+        "label": "Commande : définir soif"
+      },
+      "botcmdsettime": {
+        "desc": "Niveau d\u0027accès pour la commande définir heure.",
+        "label": "Commande : définir heure"
+      },
+      "botcmdsetweather": {
+        "desc": "Niveau d\u0027accès pour la commande définir météo.",
+        "label": "Commande : définir météo"
+      },
+      "botcmdsupport": {
+        "desc": "Niveau d\u0027accès pour la commande support.",
+        "label": "Commande : support"
+      },
+      "botcmdtime": {
+        "desc": "Niveau d\u0027accès pour la commande heure.",
+        "label": "Commande : heure"
+      },
+      "botcmdtptp": {
+        "desc": "Niveau d\u0027accès pour la commande téléportation vers joueur.",
+        "label": "Commande : téléportation vers joueur"
+      },
+      "botcmdunadmin": {
+        "desc": "Niveau d\u0027accès pour la commande retirer admin.",
+        "label": "Commande : retirer admin"
+      },
+      "botcmdunban": {
+        "desc": "Niveau d\u0027accès pour la commande débannissement.",
+        "label": "Commande : débannissement"
+      },
+      "botcmdversion": {
+        "desc": "Niveau d\u0027accès pour la commande version.",
+        "label": "Commande : version"
+      },
+      "botcmdweather": {
+        "desc": "Niveau d\u0027accès pour la commande météo.",
+        "label": "Commande : météo"
+      },
+      "botcmdyell": {
+        "desc": "Niveau d\u0027accès pour la commande cri.",
+        "label": "Commande : cri"
+      },
+      "botcommands": {
+        "desc": "Accès aux commandes du bot Discord : 0 désactivé, 1 tout le monde, 2 admins uniquement.",
+        "label": "Commandes du bot"
+      },
+      "botenable": {
+        "desc": "Active le bot Discord.",
+        "label": "Bot activé"
+      },
+      "botlang": {
+        "desc": "Langue utilisée pour les commandes du bot Discord, car le bot ne peut pas la déterminer automatiquement.",
+        "label": "Langue du bot"
+      },
+      "botsecure": {
+        "desc": "Limite les commandes sécurisées du bot aux admins configurés.",
+        "label": "Commandes sécurisées du bot"
+      },
+      "bottoken": {
+        "desc": "Jeton du bot Discord.",
+        "label": "Jeton du bot"
+      },
+      "bot": {
+        "desc": "Identité, accès et comportement des commandes du bot Discord.",
+        "label": "Bot Discord"
+      },
+      "chatchannelid": {
+        "desc": "ID du salon Discord pour les messages de chat.",
+        "label": "Salon de chat"
+      },
+      "chatformat": {
+        "desc": "Formatage du chat en jeu et Discord.",
+        "label": "Format du chat"
+      },
+      "colorizechat": {
+        "desc": "Active le formatage coloré du chat en jeu.",
+        "label": "Colorer le chat"
+      },
+      "colorlocaladmin": {
+        "desc": "Couleur RichText des messages admin locaux.",
+        "label": "Couleur locale admin"
+      },
+      "colorlocaldiscord": {
+        "desc": "Couleur RichText des messages locaux venant de Discord.",
+        "label": "Couleur locale Discord"
+      },
+      "colorlocalother": {
+        "desc": "Couleur RichText des autres messages de chat local.",
+        "label": "Couleur locale des autres"
+      },
+      "colorlocalself": {
+        "desc": "Couleur RichText des propres messages de chat local.",
+        "label": "Couleur locale personnelle"
+      },
+      "colorsupport": {
+        "desc": "Couleur RichText utilisée pour les messages de support.",
+        "label": "Couleur du support"
+      },
+      "defaultchatprefix": {
+        "desc": "Préfixe utilisé pour les messages de chat en jeu.",
+        "label": "Préfixe de chat par défaut"
+      },
+      "discordchatsyntax": {
+        "desc": "Format utilisé pour les messages de chat envoyés à Discord.",
+        "label": "Syntaxe du chat Discord"
+      },
+      "eventchannelid": {
+        "desc": "ID du salon Discord pour les messages d\u0027événements.",
+        "label": "Salon d\u0027événements"
+      },
+      "forcerestartafter": {
+        "desc": "Minutes après la demande de redémarrage avant de le forcer ; 0 désactive le redémarrage forcé.",
+        "label": "Forcer le redémarrage après"
+      },
+      "general": {
+        "desc": "Journalisation, rechargement, accueil et invitations.",
+        "label": "Général"
+      },
+      "joindiscord": {
+        "desc": "Texte ou URL affiché pour rejoindre Discord.",
+        "label": "Texte Rejoindre Discord"
+      },
+      "loglevel": {
+        "desc": "Contrôle le niveau de détail de la journalisation de DiscordConnect.",
+        "label": "Niveau de journalisation"
+      },
+      "maxscreenwidth": {
+        "desc": "Largeur maximale des captures d\u0027écran en pixels.",
+        "label": "Largeur maximale des captures"
+      },
+      "overrideavatar": {
+        "desc": "Utilise les avatars des joueurs pour les messages webhook.",
+        "label": "Remplacer l\u0027avatar"
+      },
+      "postchat": {
+        "desc": "Transfère le chat en jeu vers Discord.",
+        "label": "Publier le chat"
+      },
+      "postsupport": {
+        "desc": "Transfère les messages de support vers Discord.",
+        "label": "Publier le support"
+      },
+      "reloadonchange": {
+        "desc": "Indique que les paramètres DiscordConnect sont rechargés lorsque settings.properties change.",
+        "label": "Recharger à la modification"
+      },
+      "reportjarchanged": {
+        "desc": "Signale les changements de jar du plugin à Discord.",
+        "label": "Signaler les changements de jar"
+      },
+      "reportserverstatus": {
+        "desc": "Signale les événements de statut du serveur à Discord.",
+        "label": "Signaler le statut du serveur"
+      },
+      "reportsettingschanged": {
+        "desc": "Signale les changements de paramètres à Discord.",
+        "label": "Signaler les changements de paramètres"
+      },
+      "restartadminonly": {
+        "desc": "Réserve les changements du drapeau de redémarrage aux admins.",
+        "label": "Redémarrage réservé aux admins"
+      },
+      "restartminimumtime": {
+        "desc": "Temps de jeu minimum en secondes requis pour déclencher un redémarrage.",
+        "label": "Temps minimum de redémarrage"
+      },
+      "restarttimed": {
+        "desc": "Active la gestion des redémarrages planifiés.",
+        "label": "Redémarrage planifié"
+      },
+      "restarttimes": {
+        "desc": "Heures de redémarrage planifiées séparées par |.",
+        "label": "Heures de redémarrage"
+      },
+      "restart": {
+        "desc": "Comportement des redémarrages en jeu et planifiés.",
+        "label": "Redémarrage"
+      },
+      "routing": {
+        "desc": "Routage du chat Discord, du support et du statut.",
+        "label": "Routage des messages"
+      },
+      "screenshots": {
+        "desc": "Comportement de transfert des captures d\u0027écran des joueurs.",
+        "label": "Captures d\u0027écran"
+      },
+      "sendpluginwelcome": {
+        "desc": "Affiche un court message DiscordConnect lorsqu\u0027un joueur rejoint le serveur.",
+        "label": "Message de bienvenue"
+      },
+      "showgroup": {
+        "desc": "Inclut les informations de groupe dans les messages de chat.",
+        "label": "Afficher le groupe"
+      },
+      "statuschannelid": {
+        "desc": "ID du salon Discord pour les messages de statut.",
+        "label": "Salon de statut"
+      },
+      "statususername": {
+        "desc": "Nom d\u0027utilisateur du webhook pour les messages de statut.",
+        "label": "Nom d\u0027utilisateur de statut"
+      },
+      "supportchannelid": {
+        "desc": "ID du salon Discord pour les messages de support.",
+        "label": "Salon de support"
+      },
+      "supportscreenshot": {
+        "desc": "Ajoute des captures d\u0027écran aux messages de support par défaut.",
+        "label": "Captures d\u0027écran de support"
+      },
+      "useservername": {
+        "desc": "Utilise le nom du serveur pour les messages de statut webhook.",
+        "label": "Utiliser le nom du serveur"
+      },
+      "useshutdownnotrestart": {
+        "desc": "Envoie un arrêt au lieu d\u0027un redémarrage lorsque l\u0027option est activée.",
+        "label": "Arrêt au lieu du redémarrage"
+      },
+      "webhookchaturl": {
+        "desc": "URL du webhook pour les messages de chat.",
+        "label": "Webhook de chat"
+      },
+      "webhookeventurl": {
+        "desc": "URL du webhook pour les messages d\u0027événements.",
+        "label": "Webhook d\u0027événements"
+      },
+      "webhookstatusurl": {
+        "desc": "URL du webhook pour les messages de statut.",
+        "label": "Webhook de statut"
+      },
+      "webhooksupporturl": {
+        "desc": "URL du webhook pour les messages de support.",
+        "label": "Webhook de support"
+      },
+      "webhooks": {
+        "desc": "URL des webhooks Discord et salons cibles directs.",
+        "label": "Webhooks et salons"
+      }
+    },
+    "status": {
+      "disabled": "PH_PLUGIN_NAME est maintenant désactivé [arrêt du serveur] version : PH_PLUGIN_VERSION",
+      "enabled": "PH_PLUGIN_NAME est maintenant activé [démarrage du serveur] version : PH_PLUGIN_VERSION",
+      "restart": {
+        "flag": "Drapeau de redémarrage défini pour PH_PLUGIN_NAME, le serveur redémarrera lorsque tous les joueurs (PH_PLAYER_COUNT) auront quitté le serveur !",
+        "forced": "Redémarrage forcé de PH_PLUGIN_NAME maintenant, joueurs restants : PH_PLAYER_COUNT !",
+        "scheduled": "Redémarrage planifié de PH_PLUGIN_NAME maintenant !"
+      }
+    },
+    "support": {
+      "notavailable": "Le support Discord n\u0027est pas disponible !",
+      "success": "Votre ticket de support a été envoyé à Discord !"
+    },
+    "update": {
+      "settings": "settings.properties a été modifié, rechargement des paramètres"
+    },
+    "weather": {
+      "blizzard": "Blizzard",
+      "breeze": "Brise",
+      "clear": "Ciel dégagé",
+      "cold": "Froid",
+      "coldfog": "Brouillard froid",
+      "default": "Par défaut",
+      "densefog": "Brouillard dense",
+      "drythunder": "Orage sec",
+      "farthunder": "Orage lointain",
+      "fog": "Brouillard",
+      "heavyrain": "Forte pluie",
+      "heavysnow": "Fortes chutes de neige",
+      "heavythunder": "Violent orage",
+      "hurricane": "Ouragan",
+      "lightrain": "Pluie légère",
+      "lightsnow": "Faibles chutes de neige",
+      "overcast": "Couvert",
+      "rain": "Pluie",
+      "snow": "Neige",
+      "storm": "Tempête",
+      "sunnysnow": "Ensoleillé avec neige",
+      "thaw": "Dégel",
+      "thunder": "Orage",
+      "wind": "Vent"
+    }
+  }
+}
