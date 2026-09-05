@@ -1,5 +1,9 @@
 # History
 
+## [0.24.3] - 2026-09-05 | PluginAPI compatibility
+
+- build: update the bundled PluginAPI and JSON settings baseline for the native web release wave.
+
 ## [0.24.2] - 2026-08-14 | Restart lock scope
 
 - fix: restrict the restart login lock to Discord-triggered and scheduled restart flags; in-game restart requests retain their existing behavior

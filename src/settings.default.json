@@ -1,7 +1,5 @@
 {
   "general": {
-    "logLevel": "ALL",
-    "reloadOnChange": true,
     "sendPluginWelcome": false,
     "joinDiscord": "",
     "botEnable": false,
