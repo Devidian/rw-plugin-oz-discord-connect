@@ -8,7 +8,7 @@
 - every Discord channel can have its own webHook (chat, support and status)
 - admins can trigger server restart with `/ozrestart` that is executed after the last player left the server (it causes server shutdown, you need to be sure that server comes up automatically after that)
 - player can trigger server restart too (if you confgure it), but only if they have spent an amount of real-time on your server that you can define (default:1 day, if you play 2h a day you need 12 days to achive this)
-- plugin detects changes to settings.properties and reloads them. A message can be sent to discord if you like.
+- plugin detects changes to settings.<world>.json and reloads them. A message can be sent to discord if you like.
 - plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
 - players can type /joinDiscord to join your discord if you configure this
 - support messages now have a screenshot attached
@@ -87,7 +87,7 @@ Should look like this:
         │    │    ├── HISTORY.md
         │    │    ├── OZDiscordConnect.jar
         │    │    ├── README.md
-        │    │    └── settings.properties
+        │    │    └── settings.<world>.json
         │    ├── OZTools
         │    │    ├── assets
         │    │    │    └── ...
@@ -96,7 +96,7 @@ Should look like this:
         │    │    ├── HISTORY.md
         │    │    ├── OZTools.jar
         │    │    ├── README.md
-        │    │    └── settings.properties
+        │    │    └── settings.<world>.json
         :    :
 ```
 
@@ -110,7 +110,7 @@ just copy `dist/OZDiscordConnect` folder after build into your plugin folder, th
 
 ## Configuration
 
-The settings.properties contains all you need to configure this plugin
+The settings.<world>.json contains all you need to configure this plugin
 
 | setting                     | default         | description                                                                                                        |
 | --------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -141,7 +141,7 @@ The settings.properties contains all you need to configure this plugin
 | useServerName               | false           | if true, the servername is used as username for status posts                                                       |
 | reportStatusEnabled         | true            | if true, a message will be posted when the plugin is enabled (server boot)                                         |
 | reportStatusDisabled        | true            | if true, a message will be posted when the plugin is disabled (server shutdown)                                    |
-| reportSettingsChanged       | true            | if true, a message will be posted if settings.properties has changed                                               |
+| reportSettingsChanged       | true            | if true, a message will be posted if settings.<world>.json has changed                                               |
 | reportJarChanged            | true            | if true, a message will be posted if the jar file has changed (plugin update for example)                          |
 | statusEnabledMessage        |                 | the message that will be posted to discord on plugin enable                                                        |
 | statusDisabledMessage       |                 | the message that will be posted to discord on plugin disable                                                       |
@@ -169,3 +169,13 @@ The settings.properties contains all you need to configure this plugin
 - Run `mvn -B -DskipTests package` and `mvn -B test` before release-facing changes are merged.
 - Use `RUNTIME_TESTING.md` and `scripts/docker-runtime-smoke.sh <PluginFolderName>` for runtime smoke tests when behavior changes need server validation.
 - Keep `README.md` and `HISTORY.md` current and use Conventional Commit titles for commits and PRs.
+
+## JSON-only distribution
+
+Settings defaults (`settings.default.json`) and translations (`i18n/*.json`)
+are shipped only as JSON. Legacy default and translation `.properties` files
+are no longer included. Runtime settings remain world-scoped as
+`settings.<world>.json`; migration of an existing `settings.properties` and
+its backup remains supported. Updating the package does not delete old files
+already present on the server. Use `mvn clean package` for a fresh local
+package; ZIP assembly also excludes stale legacy settings and translations.
