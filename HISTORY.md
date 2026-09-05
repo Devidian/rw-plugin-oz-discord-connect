@@ -3,6 +3,7 @@
 ## [0.24.3] - 2026-09-05 | PluginAPI compatibility
 
 - build: update the bundled PluginAPI and JSON settings baseline for the native web release wave.
+- change: migrate Discord Connect settings and translations to JSON while retaining existing bot configuration.
 
 ## [0.24.2] - 2026-08-14 | Restart lock scope
 
