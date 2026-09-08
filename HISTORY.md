@@ -1,5 +1,9 @@
 # History
 
+## [0.24.4] - 2026-09-08 | Support screenshot
+
+- fix: attach the configured screenshot to every `/support` ticket without requiring a chat screenshot shortcut.
+
 ## [0.24.3] - 2026-09-05 | PluginAPI compatibility
 
 - build: update the bundled PluginAPI and JSON settings baseline for the native web release wave.

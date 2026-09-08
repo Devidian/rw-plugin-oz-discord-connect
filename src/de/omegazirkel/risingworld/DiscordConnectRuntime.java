@@ -423,10 +423,8 @@ class DiscordConnectRuntime extends Plugin {
 						.replace("+s ", "🖼️ ")
 						+ (s.addTeleportCommand ? "\nTeleport command:> goto " + pos.x + " " + pos.y + " " + pos.z : "")
 						+ "```";
-				Boolean screenshotWithGui = message.contains("+screen") || message.contains("+s ");
 				Boolean screenshotWithoutGui = message.contains("+screennogui") || message.contains("+sng ");
-				Boolean hasScreenshot = screenshotWithGui || screenshotWithoutGui;
-				if (s.supportScreenshot == true && hasScreenshot == true) {
+				if (s.supportScreenshot) {
 
 					int playerResolutionX = player.getScreenResolutionX();
 					float sizeFactor = 1.0f;
