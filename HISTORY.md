@@ -1,5 +1,9 @@
 # History
 
+## [0.25.0] - 2026-09-23 | JSON-only settings runtime
+
+- change: use JSON-only world settings and require manual transfer of legacy Properties values.
+
 ## [0.24.4] - 2026-09-08 | Support screenshot
 
 - fix: attach the configured screenshot to every `/support` ticket without requiring a chat screenshot shortcut.
