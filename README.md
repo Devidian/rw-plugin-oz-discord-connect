@@ -1,5 +1,7 @@
 # OmegaZirkel Discord-Plugin for Rising World
 
+**Build baseline:** JDK 25 (`--release 25`) and the bundled Rising World PluginAPI 0.9.3.2 JAR.
+
 ## Current features
 
 - post ingame chat to Discord with usernames
