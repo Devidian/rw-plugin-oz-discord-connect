@@ -5,10 +5,6 @@
  */
 package de.omegazirkel.risingworld;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MINUTE;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +14,6 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -42,6 +37,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.Method;
 import com.google.gson.Gson;
 
+import de.omegazirkel.risingworld.discordconnect.AdminRestartBridge;
 import de.omegazirkel.risingworld.discordconnect.ChatShortcutParser;
 import de.omegazirkel.risingworld.discordconnect.DiscordConnectPluginInfoStatusProvider;
 import de.omegazirkel.risingworld.discordconnect.DiscordChatMessage;
@@ -70,7 +66,6 @@ import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
 import net.risingworld.api.events.player.PlayerChatEvent;
 import net.risingworld.api.events.player.PlayerCommandEvent;
-import net.risingworld.api.events.player.PlayerDisconnectEvent;
 import net.risingworld.api.events.player.PlayerSpawnEvent;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.utils.Vector3f;
@@ -99,28 +94,29 @@ class DiscordConnectRuntime extends Plugin {
 	private ServerThreadDispatcher serverThreadDispatcher;
 	private ThreadPoolExecutor discordTransportExecutor;
 
-	// Live properties
-	static boolean flagRestart = false;
 	static Plugin pluginGlobalIntercom = null;
+	private AdminRestartBridge restartBridge;
 
 	// Timer
-	Timer restartTimer;
 	Timer activityTimer;
-	TimerTask restartTask;
-	TimerTask restartForcedTask;
 	TimerTask activityTask;
 	static String lastActivity = "";
 
-	public void setFlagRestart(boolean value) {
-		if (value && !flagRestart) {
-			lockServerForRestart();
-		}
-		flagRestart = value;
+	public String requestRestartFromDiscord() {
+		return restartBridge == null ? "unavailable" : restartBridge.requestFromDiscord();
 	}
 
-	private void lockServerForRestart() {
-		Server.sendInputCommand("lock");
-		logger().info("Server locked to prevent logins until restart");
+	public String requestRestartFromPlayer(Player player) {
+		return restartBridge == null ? "unavailable" : restartBridge.requestFromPlayer(player);
+	}
+
+	public void notifyRestartStatus(String state) {
+		switch (state) {
+			case "queued" -> statusNotification("tc.status.restart.flag");
+			case "forced" -> statusNotification("tc.status.restart.forced");
+			case "started" -> statusNotification("tc.status.restart.started");
+			default -> logger().warn("Unknown restart status: " + state);
+		}
 	}
 
 	public String getBotLanguage() {
@@ -145,6 +141,7 @@ class DiscordConnectRuntime extends Plugin {
 		DiscordConnect.instance = (DiscordConnect) this; // for timer
 		initializeTimers();
 		serverThreadDispatcher = new ServerThreadDispatcher(this);
+		restartBridge = new AdminRestartBridge(this);
 		discordTransportExecutor = new ThreadPoolExecutor(
 				1,
 				1,
@@ -203,11 +200,6 @@ class DiscordConnectRuntime extends Plugin {
 	}
 
 	private void initialize() {
-		// restartTimesString, 10);
-		if (s.restartTimed) {
-			String[] restartTimes = s.restartTimesString.split("\\|");
-			initRestartSchedule(restartTimes);
-		}
 		if (!s.botEnable) {
 			stopDiscordClient();
 			logger().warn("Discord bot is disabled");
@@ -314,27 +306,13 @@ class DiscordConnectRuntime extends Plugin {
 
 	void initializeTimers() {
 		shutdownTimers();
-		restartTimer = new Timer("OZDiscordConnect-RestartTimer", true);
 		activityTimer = new Timer("OZDiscordConnect-ActivityTimer", true);
 	}
 
 	void shutdownTimers() {
-		if (restartTask != null) {
-			restartTask.cancel();
-			restartTask = null;
-		}
-		if (restartForcedTask != null) {
-			restartForcedTask.cancel();
-			restartForcedTask = null;
-		}
 		if (activityTask != null) {
 			activityTask.cancel();
 			activityTask = null;
-		}
-		if (restartTimer != null) {
-			restartTimer.cancel();
-			restartTimer.purge();
-			restartTimer = null;
 		}
 		if (activityTimer != null) {
 			activityTimer.cancel();
@@ -377,17 +355,7 @@ class DiscordConnectRuntime extends Plugin {
 
 			switch (option) {
 				case "restart":
-					boolean canTriggerRestart = s.allowRestart && (player.isAdmin() || (!s.restartAdminOnly
-							&& player.getTotalPlayTime() > s.restartMinimumTime && s.restartMinimumTime > 0));
-					if (canTriggerRestart) {
-						String msgDC = t.get("tc.dc.shutdown", s.botLang).replace("PH_PLAYER", player.getName());
-						this.sendDiscordStatusMessage(msgDC);
-						this.broadcastMessage("tc.bc.shutdown", player.getName());
-						flagRestart = true;
-					} else {
-						player.sendTextMessage(
-								c.error + this.getName() + ":>" + c.text + t.get("tc.cmd.restart.notallowed", lang));
-					}
+					player.sendTextMessage(t.get("tc.restart.result." + requestRestartFromPlayer(player), player));
 					break;
 				case "info":
 					PluginInfoStatusProviders.show(player, name);
@@ -600,18 +568,6 @@ class DiscordConnectRuntime extends Plugin {
 	 *
 	 * @param event
 	 */
-	public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-		if (flagRestart) {
-			int playersLeft = Server.getPlayerCount() - 1;
-			if (playersLeft == 0) {
-				this.sendDiscordStatusMessage(t.get("tc.restart.player.last", s.botLang));
-				updateDiscordActivity("Restarting...");
-				restart();
-			} else if (playersLeft > 1) {
-				this.broadcastMessage("tc.bc.player.remain", playersLeft);
-			}
-		}
-	}
 
 	public void sendDiscordMessageToTextChannel(String message, long channelId) {
 		sendDiscordMessageToTextChannel(message, channelId, null);
@@ -920,123 +876,6 @@ class DiscordConnectRuntime extends Plugin {
 	 *
 	 * @param times
 	 */
-	private void initRestartSchedule(String[] times) {
-		try {
-			Calendar cal = Calendar.getInstance();
-			int minHour = 24;
-			int minMinute = 60;
-			int nextHour = -1;
-			int nextMinute = -1;
-			for (String time : times) {
-				String[] timeParts = time.split(":");
-				int hour = Integer.parseInt(timeParts[0]);
-				int minute = Integer.parseInt(timeParts[1]);
-				// get min time if we have to jump to the next day
-				if (hour <= minHour) {
-					minHour = hour;
-					if (minute <= minMinute) {
-						minMinute = minute;
-					}
-				}
-				// look for the next time to restart (nearest)
-				// Same hour but greater minutes
-				if (hour == cal.get(HOUR_OF_DAY) && minute > cal.get(MINUTE)
-						&& (nextMinute < 0 || nextMinute > minute)) {
-					logger().debug("new time found: " + hour + ":" + minute);
-					nextHour = hour;
-					nextMinute = minute;
-					// if hour is greater than current AND nextHour is not set or greater than hour
-					// AND nextMinute is not set or hour is equal nextHour and nextMinute is greater
-				} else if (hour > cal.get(HOUR_OF_DAY) && (nextHour < 0 || nextHour >= hour)
-						&& (nextMinute < 0 || (hour == nextHour && nextMinute > minute))) {
-					logger().debug("new time found: " + hour + ":" + minute);
-					nextHour = hour;
-					nextMinute = minute;
-				}
-
-			}
-
-			if (nextHour < 0) {
-				nextHour = minHour;
-				nextMinute = minMinute;
-			}
-
-			if (nextHour < cal.get(HOUR_OF_DAY) || (nextHour == cal.get(HOUR_OF_DAY) && nextMinute < cal.get(MINUTE))) {
-				cal.set(DAY_OF_MONTH, cal.get(DAY_OF_MONTH) + 1);
-			}
-			cal.set(HOUR_OF_DAY, nextHour);
-			cal.set(MINUTE, nextMinute);
-
-			logger().info("Next Server restart time is scheduled on " + nextHour + ":" + nextMinute);
-
-			if (restartTask != null) {
-				restartTask.cancel();
-			}
-
-			restartTask = new TimerTask() {
-				@Override
-				public void run() {
-					dispatchServer(DiscordConnectRuntime.this::handleScheduledRestart);
-				}
-			};
-
-			restartTimer.schedule(restartTask, cal.getTime());
-
-			// force restarting
-			if (s.forceRestartAfter > 0) {
-				if (restartForcedTask != null) {
-					restartForcedTask.cancel();
-				}
-
-				restartForcedTask = new TimerTask() {
-					@Override
-					public void run() {
-						dispatchServer(DiscordConnectRuntime.this::handleForcedRestart);
-					}
-				};
-
-				cal.set(MINUTE, nextMinute + s.forceRestartAfter);
-				restartTimer.schedule(restartForcedTask, cal.getTime());
-			}
-
-			// clear canceled tasks;
-			restartTimer.purge();
-			activityTimer.purge();
-
-		} catch (Exception e) {
-			logger().fatal(e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-	}
-
-	private void handleScheduledRestart() {
-					int playerNum = Server.getPlayerCount();
-					if (playerNum > 0) {
-						logger().info("Setting restart flag for scheduled server-restart");
-						broadcastMessage("tc.rs.schedule.info");
-						setFlagRestart(true);
-						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("tc.status.restart.flag");
-						if (s.forceRestartAfter > 0) {
-							broadcastMessage("tc.rs.schedule.warn", s.forceRestartAfter);
-						}
-					} else {
-						logger().info("Restarting server now (scheduled)");
-						if (DiscordConnect.instance != null)
-							DiscordConnect.instance.statusNotification("tc.status.restart.scheduled");
-
-						restart();
-					}
-	}
-
-	private void handleForcedRestart() {
-						logger().warn("Force server restart now!");
-						for (Player player : Server.getAllPlayers()) {
-							player.kick("Server restart");
-						}
-						forceRestart();
-	}
-
 	public boolean dispatchServer(Runnable task) {
 		return serverThreadDispatcher != null && serverThreadDispatcher.dispatch(task);
 	}
@@ -1124,40 +963,6 @@ class DiscordConnectRuntime extends Plugin {
 		}
 		s.initSettings(settingsPath.toString());
 		this.initialize();
-	}
-
-	public static void forceRestart() {
-		Server.saveAll();
-		if (DiscordConnect.instance == null) {
-			logger().error("DiscordConnect instance is null, cannot execute forceRestart()");
-			return;
-		}
-		((DiscordConnectRuntime) DiscordConnect.instance).updateDiscordActivity("Restarting soon...");
-
-		DiscordConnect.instance.statusNotification("tc.status.restart.forced");
-		DiscordConnect.instance.executeDelayed(5, () -> {
-			if (s.useShutdownNotRestart)
-				Server.sendInputCommand("shutdown");
-			else
-				Server.sendInputCommand("restart");
-		});
-	}
-
-	public static void restart() {
-		Server.saveAll();
-
-		if (DiscordConnect.instance == null) {
-			logger().error("DiscordConnect instance is null, cannot execute restart()");
-			return;
-		}
-
-		((DiscordConnectRuntime) DiscordConnect.instance).updateDiscordActivity("Restarting soon...");
-		DiscordConnect.instance.executeDelayed(5, () -> {
-			if (s.useShutdownNotRestart)
-				Server.sendInputCommand("shutdown");
-			else
-				Server.sendInputCommand("restart");
-		});
 	}
 
 	public void statusNotification(String message) {

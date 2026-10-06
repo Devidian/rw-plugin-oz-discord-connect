@@ -74,7 +74,7 @@
         "info": {
           "panel": {
             "info": "\u003cb\u003ePH_PLUGIN_NAME\u003c/b\u003e\nVersion: PH_VERSION\nCommand: /PH_PLUGIN_CMD\n\nDiscord Connect bridges ingame chat, support, status messages, restart workflows, and Discord-side admin commands.",
-            "status": "\u003cb\u003eDiscord Connect status\u003c/b\u003e\nBot enabled: PH_BOT_ENABLED\nPost chat: PH_POST_CHAT\nPost support: PH_POST_SUPPORT\nReport server status: PH_REPORT_STATUS\nReport settings changes: PH_REPORT_SETTINGS\nReport jar changes: PH_REPORT_JAR\nRestart allowed: PH_ALLOW_RESTART\nTimed restart: PH_RESTART_TIMED\nJoin Discord configured: PH_JOIN_DISCORD\nLanguage: PH_LANGUAGE\nUsed language: PH_USEDLANG\nInstalled languages: PH_LANG_AVAILABLE"
+            "status": "\u003cb\u003eDiscord Connect status\u003c/b\u003e\nBot enabled: PH_BOT_ENABLED\nPost chat: PH_POST_CHAT\nPost support: PH_POST_SUPPORT\nReport server status: PH_REPORT_STATUS\nReport settings changes: PH_REPORT_SETTINGS\nReport jar changes: PH_REPORT_JAR\nJoin Discord configured: PH_JOIN_DISCORD\nLanguage: PH_LANGUAGE\nUsed language: PH_USEDLANG\nInstalled languages: PH_LANG_AVAILABLE"
           }
         }
       },
@@ -108,6 +108,13 @@
       }
     },
     "restart": {
+      "result": {
+        "started": "Server restart started.",
+        "queued": "Server restart queued until all players disconnect.",
+        "already_pending": "A server restart is already pending.",
+        "not_allowed": "You cannot restart the server.",
+        "unavailable": "Server restart is unavailable: Admin Utils is not installed or ready."
+      },
       "player": {
         "last": "The last player has left the server, server is shutting down"
       }
@@ -444,7 +451,8 @@
       "restart": {
         "flag": "PH_PLUGIN_NAME restart flag set, server will restart when all players (PH_PLAYER_COUNT) have left the server!",
         "forced": "PH_PLUGIN_NAME forced restart now, players remaining: PH_PLAYER_COUNT!",
-        "scheduled": "PH_PLUGIN_NAME scheduled restart now!"
+        "scheduled": "PH_PLUGIN_NAME scheduled restart now!",
+        "started": "PH_PLUGIN_NAME started a server restart."
       }
     },
     "support": {

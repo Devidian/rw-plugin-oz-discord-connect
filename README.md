@@ -6,19 +6,20 @@
 - post server status messages (startup and shutdown) to Discord
 - post support messages using `/support [message]` to a Discord channel
 - every Discord channel can have its own webHook (chat, support and status)
-- admins can trigger server restart with `/ozrestart` that is executed after the last player left the server (it causes server shutdown, you need to be sure that server comes up automatically after that)
-- player can trigger server restart too (if you confgure it), but only if they have spent an amount of real-time on your server that you can define (default:1 day, if you play 2h a day you need 12 days to achive this)
+- `/dc restart` and Discord `/restart` forward restart requests to Admin Utils when installed
 - plugin detects changes to settings.<world>.json and reloads them. A message can be sent to discord if you like.
-- plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
+- plugin can report detected jar changes to Discord and in-game chat
 - players can type /joinDiscord to join your discord if you configure this
 - support messages now have a screenshot attached
 - normal chat messages which contain `+screen` or `+s` as a token have a screenshot uploaded to discord
 - normal chat messages which contain `+screennogui` or `+sng` as a token have a screenshot without interface
 - normal chat messages which contain `+tp` or `+t` as a token include the player's current coordinates
 - Public API for other plugins (status/event channel)
-- Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
-- Discord-triggered and scheduled restart flags lock the server immediately, preventing new logins until the restart completes
-- Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts
+
+Admin Utils owns restart scheduling, permissions, locking, and execution.
+Copy the former restart settings manually into Admin Utils' world JSON settings
+before enabling its schedule. Without Admin Utils, both restart commands report
+that the service is unavailable; other Discord Connect functions remain usable.
 
 The bot uses JDA 6.4.2. Enable the privileged `MESSAGE_CONTENT` intent in the
 Discord Developer Portal. Slash commands are registered per guild. Webhooks
@@ -33,7 +34,7 @@ continue to work when `botEnable=false`.
 | Command         | Description                                                    |
 | --------------- | -------------------------------------------------------------- |
 | /support [text] | sends [text] as support message to Discord                     |
-| /dc restart     | set restart flag to shutdown server after last player has left |
+| /dc restart     | forward a restart request to Admin Utils                       |
 | /joinDiscord    | join the servers Discord server                                |
 | /dc info        | Open the shared Tools Info/Status panel                        |
 | /dc help        | Show plugin commands                                           |
@@ -53,7 +54,7 @@ The plugin radial menu entry opens the same shared Tools Info/Status panel using
 | /gettime                                | shows the current ingame time                                  |
 | /getbanned                              | shows a list of banned players with name, UID and reason       |
 | **administrative commands:**            |                                                                |
-| /restart                                | set restart flag to shutdown server after last player has left |
+| /restart                                | forward a restart request to Admin Utils                       |
 | /support [PLAYERNAME] [TEXT]            | sends a text message to a player (must be online)              |
 | /kick [PLAYERNAME] [REASON?]            | kick player with an optional reason                            |
 | /ban [PLAYERNAME] [REASON?]             | ban a player with an optional reason                           |
@@ -116,7 +117,6 @@ The settings.<world>.json contains all you need to configure this plugin
 | --------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **General plugin settings** |                 |                                                                                                                    |
 | logLevel                    | 0               | Logging to server console higher values means less output 0=all (debug)                                            |
-| restartOnUpdate             | false           | if true, restart flag is set automatically if plugin file has changed on the server                                |
 | sendPluginWelcome           | false           | -                                                                                                                  |
 | **JDA bot settings**        |                 |                                                                                                                    |
 | botEnable                   | false           | Enables usage of DiscordBot                                                                                        |
@@ -126,13 +126,8 @@ The settings.<world>.json contains all you need to configure this plugin
 | botChatChannelName          | server-chat     | -                                                                                                                  |
 | botAdmins                   |                 | comma-separated exact Discord user snowflake IDs; names and partial IDs are rejected                              |
 | **other plugin settings**   |                 |                                                                                                                    |
-| allowRestart                | false           | if true, normal players are allowed to use /ozrestart after they played `restartMinimumTime` seconds on the server |
-| restartMinimumTime          | 86400           | player must play at least this time in seconds to use restart feature                                              |
 | allowScreenshots            | true            | -                                                                                                                  |
 | joinDiscord                 |                 | the code to join discord (not the full url!)                                                                       |
-| restartTimed                | false           | enable or disable scheduled restart feature                                                                        |
-| restartTimes                | 00:00           | set restart times for scheduled restart use hh:mm to add multiple values split them with a pipe                    |
-| forceRestartAfter           | 0               | force restart after this time (minutes) (0 if you do not want to force restart)                                    |
 | **Chat settings**           |                 |                                                                                                                    |
 | postChat                    | false           | if true, chat is posted to the webHook for Chat                                                                    |
 | webHookChatUrl              |                 | this is the webHook used for ingame chat                                                                           |

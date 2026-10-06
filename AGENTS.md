@@ -8,7 +8,7 @@ It must remain usable standalone. Workspace-root orchestration is optional and m
 ## Ownership
 Owns:
 - in-game chat/support/status forwarding to Discord
-- Discord-triggered admin/server commands and restart coordination
+- Discord-triggered admin/server commands and optional restart forwarding to Admin Utils
 - Discord webhook, bot, and public plugin API integration surfaces
 
 Does not own:

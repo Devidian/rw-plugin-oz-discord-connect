@@ -75,7 +75,7 @@
         "info": {
           "panel": {
             "info": "\u003cb\u003ePH_PLUGIN_NAME\u003c/b\u003e\nVersion: PH_VERSION\nBefehl: /PH_PLUGIN_CMD\n\nDiscord Connect verbindet Ingame-Chat, Support, Statusmeldungen, Neustartabläufe und Discord-Admin-Kommandos.",
-            "status": "\u003cb\u003eDiscord Connect Status\u003c/b\u003e\nBot aktiv: PH_BOT_ENABLED\nChat weiterleiten: PH_POST_CHAT\nSupport weiterleiten: PH_POST_SUPPORT\nServerstatus melden: PH_REPORT_STATUS\nSettings-Änderungen melden: PH_REPORT_SETTINGS\nJar-Änderungen melden: PH_REPORT_JAR\nNeustart erlaubt: PH_ALLOW_RESTART\nZeitgesteuerter Neustart: PH_RESTART_TIMED\nJoin-Discord konfiguriert: PH_JOIN_DISCORD\nSprache: PH_LANGUAGE\nVerwendete Sprache: PH_USEDLANG\nInstallierte Sprachen: PH_LANG_AVAILABLE"
+            "status": "\u003cb\u003eDiscord Connect Status\u003c/b\u003e\nBot aktiv: PH_BOT_ENABLED\nChat weiterleiten: PH_POST_CHAT\nSupport weiterleiten: PH_POST_SUPPORT\nServerstatus melden: PH_REPORT_STATUS\nSettings-Änderungen melden: PH_REPORT_SETTINGS\nJar-Änderungen melden: PH_REPORT_JAR\nJoin-Discord konfiguriert: PH_JOIN_DISCORD\nSprache: PH_LANGUAGE\nVerwendete Sprache: PH_USEDLANG\nInstallierte Sprachen: PH_LANG_AVAILABLE"
           }
         }
       },
@@ -109,6 +109,13 @@
       }
     },
     "restart": {
+      "result": {
+        "started": "Server-Neustart gestartet.",
+        "queued": "Server-Neustart vorgemerkt, bis alle Spieler den Server verlassen haben.",
+        "already_pending": "Ein Server-Neustart ist bereits vorgemerkt.",
+        "not_allowed": "Du darfst den Server nicht neu starten.",
+        "unavailable": "Server-Neustart ist nicht verfügbar: Admin Utils ist nicht installiert oder bereit."
+      },
       "player": {
         "last": "Der letzte Spieler hat den Server verlassen, Server wird heruntergefahren"
       }
@@ -445,7 +452,8 @@
       "restart": {
         "flag": "PH_PLUGIN_NAME Neustart Flag gesetzt, Server wird neu gestartet wenn alle Spieler (PH_PLAYER_COUNT) den Server verlassen haben!",
         "forced": "PH_PLUGIN_NAME erzwungener Neustart jetzt, Spieler verbleibend: PH_PLAYER_COUNT!",
-        "scheduled": "PH_PLUGIN_NAME geplanter Neustart jetzt!"
+        "scheduled": "PH_PLUGIN_NAME geplanter Neustart jetzt!",
+        "started": "PH_PLUGIN_NAME hat einen Server-Neustart gestartet."
       }
     },
     "support": {

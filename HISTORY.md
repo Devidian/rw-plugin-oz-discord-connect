@@ -1,5 +1,11 @@
 # History
 
+## Unreleased
+
+## [0.25.1] - 2026-10-06 | Admin Utils restart delegation
+
+- change: delegate Discord and in-game restart commands to Admin Utils and remove local scheduling and restart settings.
+
 ## [0.25.0] - 2026-09-23 | JSON-only settings runtime
 
 - change: use JSON-only world settings and require manual transfer of legacy Properties values.

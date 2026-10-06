@@ -229,12 +229,12 @@ public final class DiscordCommandService {
     }
 
     private DiscordCommandResult restart(DiscordCommandRequest request) {
-        if (Server.getPlayerCount() == 0) {
-            DiscordConnect.restart();
-            return text(request, "Server restart initiated");
-        }
-        plugin.setFlagRestart(true);
-        return text(request, "Restart queued until all players disconnect");
+        return text(request, switch (plugin.requestRestartFromDiscord()) {
+            case "started" -> "Server restart initiated";
+            case "queued" -> "Restart queued until all players disconnect";
+            case "already_pending" -> "Server restart is already pending";
+            default -> "Server restart is unavailable: Admin Utils is not installed or ready";
+        });
     }
 
     private DiscordCommandResult reloadPlugins(DiscordCommandRequest request) {

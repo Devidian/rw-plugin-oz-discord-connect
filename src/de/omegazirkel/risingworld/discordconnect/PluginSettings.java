@@ -68,15 +68,6 @@ public class PluginSettings {
 
 	// Discord SlashCommands settings
 	public boolean botSecure = true;
-	public boolean restartAdminOnly = true;
-	public boolean allowRestart = false;
-
-	// other settings
-	// reloadallplugins
-	public int restartMinimumTime = 86400;// (60 * 60 * 24); // 1 Day default
-	public boolean restartTimed = false; // restart schedule
-	public int forceRestartAfter = 5; // Minutes
-	public boolean useShutdownNotRestart = true;
 
 	// screenshots
 
@@ -93,7 +84,6 @@ public class PluginSettings {
 	public String defaultChatPrefix = "[LOCAL] ";
 	public String discordChatSyntax = "[chat] **PH_PLAYER**: **PH_MESSAGE**";
 
-	public String restartTimesString = "";
 
 	public Map<String, Short> discordCommands = new HashMap<>();
 
@@ -210,19 +200,6 @@ public class PluginSettings {
 
 			// motd settings
 			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "false").contentEquals("true");
-
-			// restart settings
-			restartTimed = settings.getProperty("restartTimed", "false").contentEquals("true");
-			allowRestart = settings.getProperty("allowRestart", "false").contentEquals("true");
-			restartAdminOnly = settings.getProperty("restartAdminOnly", "false").contentEquals("true");
-			// "false").contentEquals("true");
-			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "86400"));
-			forceRestartAfter = Integer.parseInt(settings.getProperty("forceRestartAfter", "0"));
-			useShutdownNotRestart = settings.getProperty("useShutdownNotRestart", "true").contentEquals("true");
-
-			// parse next restart time (we only need the next beacause we have to lookup
-			// again after restart)
-			restartTimesString = settings.getProperty("restartTimes", "00:00");
 
 			// WebhookUrls
 			webHookChatUrl = new URI(settings.getProperty("webHookChatUrl", ""));
@@ -380,26 +357,6 @@ public class PluginSettings {
 				entry("addTeleportCommand", "Support teleport command",
 						"Adds a teleport command to support messages when coordinates are available.",
 						addTeleportCommand, "true", AdminSettingsType.BOOLEAN),
-				AdminSettingsEntry.group("restart", "Restart", "Ingame and scheduled restart behavior."),
-				entry("allowRestart", "Allow restart", "Enables ingame restart commands.", allowRestart, "false",
-						AdminSettingsType.BOOLEAN),
-				entry("restartAdminOnly", "Restart admin only",
-						"Restricts restart flag changes to admins.", restartAdminOnly, "false",
-						AdminSettingsType.BOOLEAN),
-				entry("restartMinimumTime", "Restart minimum time",
-						"Minimum player playtime in seconds required to trigger restart.", restartMinimumTime,
-						"86400", AdminSettingsType.INTEGER),
-				entry("restartTimed", "Scheduled restart", "Enables scheduled restart handling.", restartTimed,
-						"false", AdminSettingsType.BOOLEAN),
-				readOnlyEntry("restartTimes", "Restart times",
-						"Scheduled restart times separated by |.", restartTimesString, "00:00",
-						AdminSettingsType.STRING),
-				entry("forceRestartAfter", "Force restart after",
-						"Minutes after restart request before forcing restart; 0 disables forced restart.",
-						forceRestartAfter, "0", AdminSettingsType.INTEGER),
-				entry("useShutdownNotRestart", "Shutdown instead of restart",
-						"Sends shutdown instead of restart when enabled.", useShutdownNotRestart, "true",
-						AdminSettingsType.BOOLEAN),
 				AdminSettingsEntry.group("screenshots", "Screenshots", "Player screenshot forwarding behavior."),
 				entry("allowScreenshots", "Allow screenshots",
 						"Allows players to post screenshots through chat shortcuts.", allowScreenshots, "true",
