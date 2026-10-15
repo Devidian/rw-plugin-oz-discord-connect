@@ -1,6 +1,9 @@
 package de.omegazirkel.risingworld.discordconnect;
 
 import java.time.Duration;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +15,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.ExceptionEvent;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -84,6 +88,57 @@ public final class JdaDiscordClient implements EventListener, AutoCloseable {
         } else {
             channel.sendMessage(message).addFiles(FileUpload.fromData(image, "screenshot.jpg")).complete();
         }
+    }
+
+    /** Runs on Discord Connect's serial transport worker. */
+    public ThreadChannel resolveThread(long parentChannelId, String topic, DiscordThreadRegistry registry) throws IOException {
+        JDA connection = jda;
+        if (connection == null || !isReady()) throw new IllegalStateException("Discord bot is unavailable");
+        TextChannel parent = connection.getTextChannelById(parentChannelId);
+        if (parent == null) throw new IllegalStateException("Discord text channel " + parentChannelId + " was not found");
+
+        Long savedId = registry.get(parentChannelId, topic);
+        if (savedId != null) {
+            ThreadChannel cached = connection.getThreadChannelById(savedId);
+            if (cached != null && cached.isPublic() && cached.getParentChannel().getIdLong() == parentChannelId) {
+                return prepareThread(cached);
+            }
+        }
+
+        List<ThreadChannel> threads = new ArrayList<>();
+        parent.getGuild().retrieveActiveThreads().complete().stream()
+                .filter(thread -> thread.isPublic() && thread.getParentChannel().getIdLong() == parentChannelId)
+                .forEach(threads::add);
+        parent.retrieveArchivedPublicThreadChannels().iterator().forEachRemaining(threads::add);
+
+        ThreadChannel selected = DiscordThreadSelector.select(threads, savedId, topic,
+                ThreadChannel::getIdLong, ThreadChannel::getName);
+        if (savedId != null) {
+            if (threads.stream().noneMatch(thread -> thread.getIdLong() == savedId)) {
+                DiscordConnect.logger().warn("Discord thread " + savedId + " for channel " + parentChannelId
+                        + " and topic '" + topic + "' was deleted; recovering by name");
+                registry.remove(parentChannelId, topic);
+            }
+        }
+        if (selected == null) {
+            selected = parent.createThreadChannel(topic).complete();
+            registry.put(parentChannelId, topic, selected.getIdLong());
+        } else if (savedId == null || savedId != selected.getIdLong()) {
+            registry.put(parentChannelId, topic, selected.getIdLong());
+        }
+        return prepareThread(selected);
+    }
+
+    private static ThreadChannel prepareThread(ThreadChannel thread) {
+        if (thread.isLocked()) throw new IllegalStateException("Discord thread " + thread.getId() + " is locked");
+        if (thread.isArchived()) thread.getManager().setArchived(false).complete();
+        if (!thread.isJoined()) thread.join().complete();
+        return thread;
+    }
+
+    public void sendThreadMessage(ThreadChannel thread, String message, byte[] image) {
+        if (image == null) thread.sendMessage(message).complete();
+        else thread.sendMessage(message).addFiles(FileUpload.fromData(image, "screenshot.jpg")).complete();
     }
 
     public void sendResult(DiscordCommandResult result) {

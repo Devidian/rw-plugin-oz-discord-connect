@@ -31,6 +31,16 @@ continue to work when `botEnable=false`.
 
 - currently none
 
+## Plugin event threads
+
+Plugins may call `sendDiscordMessageToTextChannel(message, channelId, image, topic)` to send an event to a public thread in a text channel. Existing overloads still post directly to the channel. A null or blank `topic` also posts directly. Topic names are trimmed, case-sensitive, and limited to 100 visible characters. The same topic in the same parent channel uses one thread; the same topic in another channel uses a separate thread.
+
+Discord Connect stores thread IDs in `discord-threads.json` beside its world settings. Back up this file with other plugin data. It follows a saved thread ID after a manual rename. If the saved thread is deleted, it adopts one exact-name match or creates a replacement; duplicate-name matches are rejected. If Discord reports deletion during a send, that message fails and the next send recovers. Archived threads are unarchived; locked or inaccessible threads fail with a log entry. Topic-routed messages never fall back to the parent channel. The bot must be enabled and allowed to create public threads, join them, and send messages in them.
+
+The optional webhook overload `sendDiscordMessageToWebHook(username, text, webhookUrl, image, parentChannelId, topic)` resolves the same thread and appends `thread_id` to the webhook request while preserving the webhook identity and image handling. The bot is required for topic resolution even when the message is delivered through a webhook. Existing chat, support, and status routes keep their direct channel behavior.
+
+For a shared thread, set GPS `discordStaticGPSChannelId` and Rewards `discordRewardsChannelId` to the same text channel ID, then set `discordStaticGPSThreadTopic` and `discordRewardsThreadTopic` to the same name, for example `World events`. Set the channel IDs to `0` to disable those routes.
+
 ## Commands ingame
 
 | Command         | Description                                                    |

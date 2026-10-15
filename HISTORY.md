@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## [0.25.2] - 2026-10-15 | Discord event threads
+
+- feat: Add persistent, channel-scoped public thread routing for plugin events and optional webhook delivery by thread ID.
+
 ## [0.25.1] - 2026-10-06 | Admin Utils restart delegation
 
 - change: delegate Discord and in-game restart commands to Admin Utils and remove local scheduling and restart settings.

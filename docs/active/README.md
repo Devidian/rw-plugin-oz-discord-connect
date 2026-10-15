@@ -4,6 +4,8 @@ Active implementation tasks live here.
 
 [Bugs 05 Discord Threading](bugs-05-discord-threading.md)
 
+[Discord topic threads for plugin events](discord-topic-threads-2026-10-11.md)
+
 Use one markdown file per task. Each task must include objective, ownership, dependencies, risks, validation strategy, affected repositories/plugins, rollback considerations, and a markdown checkbox checklist.
 
 ## Template

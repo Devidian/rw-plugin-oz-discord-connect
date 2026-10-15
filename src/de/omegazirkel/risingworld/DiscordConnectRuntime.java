@@ -44,6 +44,7 @@ import de.omegazirkel.risingworld.discordconnect.DiscordChatMessage;
 import de.omegazirkel.risingworld.discordconnect.DiscordCommandRequest;
 import de.omegazirkel.risingworld.discordconnect.DiscordCommandResult;
 import de.omegazirkel.risingworld.discordconnect.DiscordCommandService;
+import de.omegazirkel.risingworld.discordconnect.DiscordThreadRegistry;
 import de.omegazirkel.risingworld.discordconnect.JdaDiscordClient;
 import de.omegazirkel.risingworld.discordconnect.PluginSettings;
 import de.omegazirkel.risingworld.discordconnect.ui.DiscordConnectPlayerPluginData;
@@ -69,6 +70,9 @@ import net.risingworld.api.events.player.PlayerCommandEvent;
 import net.risingworld.api.events.player.PlayerSpawnEvent;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.utils.Vector3f;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 /**
  *
@@ -93,6 +97,7 @@ class DiscordConnectRuntime extends Plugin {
 	public static PlayerSettings playerSettings;
 	private ServerThreadDispatcher serverThreadDispatcher;
 	private ThreadPoolExecutor discordTransportExecutor;
+	private DiscordThreadRegistry threadRegistry;
 
 	static Plugin pluginGlobalIntercom = null;
 	private AdminRestartBridge restartBridge;
@@ -157,6 +162,11 @@ class DiscordConnectRuntime extends Plugin {
 		t = I18n.getInstance(this);
 			s = PluginSettings.getInstance((DiscordConnect) this);
 		sqliteCon = SQLiteConnectionFactory.open(this);
+		try {
+			threadRegistry = new DiscordThreadRegistry(Path.of(getPath() == null ? "." : getPath(), "discord-threads.json"));
+		} catch (IOException ex) {
+			logger().error("Discord thread registry unavailable: " + ex.getMessage());
+		}
 		playerSettings = new PlayerSettings(sqliteCon);
 		// lookup connected plugins
 		pluginGlobalIntercom = getPluginByName("OZ - Global Intercom");
@@ -587,6 +597,44 @@ class DiscordConnectRuntime extends Plugin {
 		submitDiscordTransport(() -> sendDiscordMessageToTextChannelNow(client, message, channelId, imageCopy));
 	}
 
+	/** Topic-aware public API. A blank topic retains direct channel delivery. */
+	public void sendDiscordMessageToTextChannel(String message, long channelId, byte[] image, String topic) {
+		final String normalized;
+		try {
+			normalized = DiscordThreadRegistry.normalize(topic);
+		} catch (IllegalArgumentException ex) {
+			logger().error("Invalid Discord topic for channel " + channelId + ": " + ex.getMessage());
+			return;
+		}
+		if (normalized == null) {
+			sendDiscordMessageToTextChannel(message, channelId, image);
+			return;
+		}
+		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
+		submitDiscordTransport(() -> {
+			JdaDiscordClient client = discordClient;
+			if (channelId <= 0 || client == null || threadRegistry == null) {
+				logger().error("Cannot route Discord topic '" + normalized + "' in channel " + channelId
+						+ ": channel, bot, or registry unavailable");
+				return;
+			}
+			try {
+				ThreadChannel thread = client.resolveThread(channelId, normalized, threadRegistry);
+				try {
+					client.sendThreadMessage(thread, message, imageCopy);
+				} catch (ErrorResponseException ex) {
+					if (ex.getErrorResponse() == ErrorResponse.UNKNOWN_CHANNEL) {
+						threadRegistry.remove(channelId, normalized);
+					}
+					throw ex;
+				}
+			} catch (IOException | RuntimeException ex) {
+				logger().error("Discord topic delivery failed for channel " + channelId + " and topic '"
+						+ normalized + "': " + ex.getMessage());
+			}
+		});
+	}
+
 	private void sendDiscordMessageToTextChannelNow(JdaDiscordClient client, String message, long channelId, byte[] image) {
 		if (channelId == 0) {
 			logger().warn("⚠️ channelId = 0, set channelId in plugin settings or deactivate this channel");
@@ -609,6 +657,45 @@ class DiscordConnectRuntime extends Plugin {
 	private void sendDiscordMessageToWebHook(String username, String text, URI channel, byte[] image) {
 		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
 		submitDiscordTransport(() -> sendDiscordMessageToWebHookNow(username, text, channel, imageCopy));
+	}
+
+	/** Optional webhook route to the same persistent thread identity as bot messages. */
+	public void sendDiscordMessageToWebHook(String username, String text, URI webhookUrl, byte[] image,
+			long parentChannelId, String topic) {
+		final String normalized;
+		try {
+			normalized = DiscordThreadRegistry.normalize(topic);
+		} catch (IllegalArgumentException ex) {
+			logger().error("Invalid Discord webhook topic for channel " + parentChannelId + ": " + ex.getMessage());
+			return;
+		}
+		byte[] imageCopy = image == null ? null : Arrays.copyOf(image, image.length);
+		submitDiscordTransport(() -> {
+			if (normalized == null) {
+				sendDiscordMessageToWebHookNow(username, text, webhookUrl, imageCopy);
+				return;
+			}
+			JdaDiscordClient client = discordClient;
+			if (parentChannelId <= 0 || client == null || threadRegistry == null || webhookUrl == null) {
+				logger().error("Cannot route Discord webhook topic '" + normalized + "' in channel "
+						+ parentChannelId + ": channel, bot, registry, or webhook unavailable");
+				return;
+			}
+			try {
+				long threadId = client.resolveThread(parentChannelId, normalized, threadRegistry).getIdLong();
+				if (webhookUrl.getRawFragment() != null || (webhookUrl.getRawQuery() != null
+						&& Arrays.stream(webhookUrl.getRawQuery().split("&"))
+								.anyMatch(part -> part.equals("thread_id") || part.startsWith("thread_id=")))) {
+					throw new IllegalArgumentException("Webhook URL already selects a thread or has a fragment");
+				}
+				String separator = webhookUrl.getRawQuery() == null ? "?" : "&";
+				URI routedUrl = URI.create(webhookUrl + separator + "thread_id=" + threadId);
+				sendDiscordMessageToWebHookNow(username, text, routedUrl, imageCopy);
+			} catch (IOException | RuntimeException ex) {
+				logger().error("Discord webhook topic delivery failed for channel " + parentChannelId
+						+ " and topic '" + normalized + "': " + ex.getMessage());
+			}
+		});
 	}
 
 	private void sendDiscordMessageToWebHookNow(String username, String text, URI channel, byte[] image) {
@@ -650,7 +737,9 @@ class DiscordConnectRuntime extends Plugin {
 				@Override
 				public void completed(SimpleHttpResponse result) {
 					int status = result.getCode();
-					if (status != 204) {
+					if (status < 200 || status >= 300) {
+						logger().error("Discord text webhook failed with HTTP " + status + ": " + result.getBodyText());
+					} else if (status != 204) {
 						logger().debug("Discord text response: " + status + "\n" + result.getBodyText());
 					}
 					textFuture.complete(result);
@@ -710,7 +799,9 @@ class DiscordConnectRuntime extends Plugin {
 						@Override
 						public void completed(SimpleHttpResponse result) {
 							int status = result.getCode();
-							if (status != 204) {
+							if (status < 200 || status >= 300) {
+								logger().error("Discord image webhook failed with HTTP " + status + ": " + result.getBodyText());
+							} else if (status != 204) {
 								logger().debug("Discord image response: " + status + "\n" + result.getBodyText());
 							}
 							imageFuture.complete(result);
