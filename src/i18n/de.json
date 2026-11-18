@@ -1,6 +1,7 @@
 {
   "\n•": "Wenn der DiscordBot in den settings.properties aktiviert wurde, kann ein Admin\nSupport nachrichten an einen oder alle Spieler aus dem Discord schreiben.\n• Es kann ein Kanal definiert werden für Discord um vom Discord aus in den lokalen\nchat im Spiel schreiben zu können.\n• Wenn \"+screen\" oder \"+s\" als Chat-Token geschrieben wird, wird ein Screenshot zum Discord-Kanal gesendet.\n• Wenn \"+screennogui\" oder \"+sng\" als Chat-Token geschrieben wird, wird ein Screenshot ohne Interface zum Discord-Kanal gesendet.\n• Wenn \"+tp\" oder \"+t\" als Chat-Token geschrieben wird, werden deine Koordinaten in den chat und zum Discord gesendet.\n\nZusätzlich gibt es ein paar unterstützende Admin-Befehle.\nFür mehr Informationen tippe PH_CMD_HELP\n",
   "tc": {
+    "chat": { "consent": { "required": "Der Community-Chat über Discord ist nur mit deiner Freigabe für externe Datenverarbeitung möglich. Bitte entscheide unter /ozt config. Wenn Discord nicht erreichbar ist, steht der lokale Chat allen Spielern zur Verfügung." } },
     "bc": {
       "banned": "PH_DISCORDUSER hat den Spieler PH_PLAYER gebannt, Grund: PH_REASON",
       "group": "PH_DISCORDUSER changed permission-group of PH_PLAYER to PH_GROUP",
@@ -457,6 +458,7 @@
       }
     },
     "support": {
+      "consent": {"required": "Für Discord-Support erlaube bitte zuerst die externe Discord-Verarbeitung in /ozt config."},
       "notavailable": "Discord Support nicht verfügbar!",
       "success": "Dein Support Ticket wurde an Discord gesendet!"
     },

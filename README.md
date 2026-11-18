@@ -1,5 +1,7 @@
 # OmegaZirkel Discord-Plugin for Rising World
 
+When the Discord bot is connected, community chat requires the player's Discord data permission. A player without it receives a consent hint instead of a local copy, and incoming Discord chat reaches only consenting players. Discord support, broadcast and yell commands also reach consenting players only; the Discord online command uses a DBID instead of name and UID for nonconsenting players. If the bot is disabled or disconnected, local game chat is available to every player.
+
 **Build baseline:** JDK 25 (`--release 25`) and the bundled Rising World PluginAPI 0.9.3.2 JAR.
 
 ## Current features

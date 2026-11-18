@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.StringJoiner;
 
 import de.omegazirkel.risingworld.DiscordConnect;
+import de.omegazirkel.risingworld.tools.ExternalDataConsent;
 import de.omegazirkel.risingworld.tools.Colors;
 import net.risingworld.api.Server;
 import net.risingworld.api.database.WorldDatabase.Target;
@@ -84,7 +85,9 @@ public final class DiscordCommandService {
         StringJoiner players = new StringJoiner("\n",
                 plugin.getTranslator().get("tc.cmd.out.online.list", settings.botLang) + "\n", "");
         for (Player player : Server.getAllPlayers()) {
-            players.add(player.getName() + " uid:" + player.getUID() + " g:" + player.getPermissionGroup()
+            String identity = ExternalDataConsent.isGranted(player, ExternalDataConsent.Purpose.DISCORD)
+                    ? player.getName() + " uid:" + player.getUID() : "Spieler #" + player.getDbID();
+            players.add(identity + " g:" + player.getPermissionGroup()
                     + (player.isAdmin() ? " [A]" : ""));
         }
         return longText(request, players.toString(), "online.txt");
@@ -202,6 +205,9 @@ public final class DiscordCommandService {
         if (player == null || message.isBlank()) {
             return text(request, "playername and text must be set");
         }
+        if (!ExternalDataConsent.isGranted(player, ExternalDataConsent.Purpose.DISCORD)) {
+            return text(request, "Player has not permitted Discord messages");
+        }
         player.sendTextMessage(settings.colorSupport + "[SUPPORT] " + request.displayName() + ": "
                 + colors.endTag + message);
         return text(request, "Message sent to " + player.getName());
@@ -220,12 +226,14 @@ public final class DiscordCommandService {
     private DiscordCommandResult broadcast(DiscordCommandRequest request, boolean yell) {
         String message = settings.colorSupport + "[" + option(request, "channel", "local") + "] "
                 + request.displayName() + ": " + colors.endTag + option(request, "text", "Hello World!");
-        if (yell) {
-            Server.broadcastYellMessage(message, 10, false);
-        } else {
-            Server.broadcastTextMessage(message);
+        int delivered = 0;
+        for (Player player : Server.getAllPlayers()) {
+            if (!ExternalDataConsent.isGranted(player, ExternalDataConsent.Purpose.DISCORD)) continue;
+            if (yell) player.sendYellMessage(message, 10, false);
+            else player.sendTextMessage(message);
+            delivered++;
         }
-        return text(request, "Message sent");
+        return text(request, "Message sent to " + delivered + " consenting players");
     }
 
     private DiscordCommandResult restart(DiscordCommandRequest request) {

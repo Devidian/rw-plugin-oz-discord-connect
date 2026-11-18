@@ -1,5 +1,6 @@
 {
   "tc": {
+    "chat": { "consent": { "required": "The Discord community chat requires your permission for external data processing. Please choose under /ozt config. If Discord is unavailable, local chat is available to everyone." } },
     "bc": {
       "banned": "PH_DISCORDUSER banned player PH_PLAYER, reason: PH_REASON",
       "group": "PH_DISCORDUSER changed permission group of PH_PLAYER to PH_GROUP",
@@ -456,6 +457,7 @@
       }
     },
     "support": {
+      "consent": {"required": "To use Discord support, first allow external Discord processing in /ozt config."},
       "notavailable": "Discord support is not available!",
       "success": "Your support ticket has been sent to Discord!"
     },

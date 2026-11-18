@@ -95,9 +95,11 @@ class DiscordConnectRuntime extends Plugin {
 	public static String name;
 	public static Connection sqliteCon;
 	public static PlayerSettings playerSettings;
+	private de.omegazirkel.risingworld.tools.privacy.PlayerErasureService.Registration erasureRegistration;
 	private ServerThreadDispatcher serverThreadDispatcher;
 	private ThreadPoolExecutor discordTransportExecutor;
 	private DiscordThreadRegistry threadRegistry;
+	private AutoCloseable discordConsentRegistration;
 
 	static Plugin pluginGlobalIntercom = null;
 	private AdminRestartBridge restartBridge;
@@ -168,12 +170,20 @@ class DiscordConnectRuntime extends Plugin {
 			logger().error("Discord thread registry unavailable: " + ex.getMessage());
 		}
 		playerSettings = new PlayerSettings(sqliteCon);
+		erasureRegistration = de.omegazirkel.risingworld.tools.privacy.PlayerErasureService.register(
+				"discord-local", request -> {
+					playerSettings.erasePlayer(request.playerDbId());
+					return true;
+				});
 		// lookup connected plugins
 		pluginGlobalIntercom = getPluginByName("OZ - Global Intercom");
 		if (pluginGlobalIntercom != null) {
 			logger().info("ℹ️ Global Intercom found! ID: " + pluginGlobalIntercom.getID());
 		}
 		s.initSettings();
+		discordConsentRegistration = de.omegazirkel.risingworld.tools.ExternalDataConsent.registerPurpose(
+				de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD,
+				() -> true);
 			commandService = new DiscordCommandService((DiscordConnect) this);
 		this.initialize();
 		this.statusNotification("tc.status.enabled");
@@ -266,6 +276,9 @@ class DiscordConnectRuntime extends Plugin {
 	 */
 	@Override
 	public void onDisable() {
+		if (erasureRegistration != null) erasureRegistration.close();
+		try { if (discordConsentRegistration != null) discordConsentRegistration.close(); }
+		catch (Exception ex) { logger().warn("Discord consent registration cleanup failed: " + ex.getMessage()); }
 		logger().warn("⚠️ Disabling " + this.getName() + " ...");
 		if (serverThreadDispatcher != null) {
 			serverThreadDispatcher.close();
@@ -392,6 +405,11 @@ class DiscordConnectRuntime extends Plugin {
 				return;
 			}
 			String message = cmdParts[1];
+			if (!de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(
+					player, de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) {
+				player.sendTextMessage(t.get("tc.support.consent.required", lang));
+				return;
+			}
 
 			if (s.postSupport) {
 				String supportMessage = "```" + player.getName() + ": " + message
@@ -413,6 +431,8 @@ class DiscordConnectRuntime extends Plugin {
 					final int playerDbId = player.getDbID();
 					final String playerLanguage = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 					player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
+						if (!de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(
+								playerDbId, de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) return;
 						final ByteArrayOutputStream os = new ByteArrayOutputStream();
 						try {
 							ImageIO.write(bimg, "jpg", os);
@@ -461,12 +481,21 @@ class DiscordConnectRuntime extends Plugin {
 		if (!processMessage) {
 			return;
 		}
-
 		if (pluginGlobalIntercom != null) {
 			processMessage = !isGlobalIntercomMessage(event.getPlayer(), event.getChatMessage());
 			if (noColorText.startsWith("#%")) {
 				noColorText = noColorText.substring(2);
 			}
+		}
+		if (!processMessage || noColorText.trim().isEmpty()) return;
+		// A disconnected or disabled bot makes the game chat local for everyone.
+		if (!s.botEnable || discordClient == null || !discordClient.isReady()) return;
+		if (!de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(
+				event.getPlayer(), de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) {
+			event.setCancelled(true);
+			event.getPlayer().sendTextMessage(t.get("tc.chat.consent.required",
+					de.omegazirkel.risingworld.OZTools.getPlayerLanguage(event.getPlayer())));
+			return;
 		}
 
 		if (processMessage && noColorText.trim().length() > 0) {
@@ -491,6 +520,8 @@ class DiscordConnectRuntime extends Plugin {
 				final String playerLanguage = de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player);
 				logger().debug("Taking screenshot with factor " + sizeFactor);
 				player.createScreenshot(sizeFactor, 1, !screenshotWithoutGui, (BufferedImage bimg) -> {
+					if (!de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(
+							player.getDbID(), de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) return;
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					try {
 						ImageIO.write(bimg, "jpg", os);
@@ -506,10 +537,8 @@ class DiscordConnectRuntime extends Plugin {
 				}
 				this.sendDiscordChatMessage(player.getName(), noColorText, de.omegazirkel.risingworld.OZTools.getPlayerLanguage(player));
 			}
-			if (s.colorizeChat) {
-				broadcastChatMessage(player, noColorText);
-				event.setCancelled(true);
-			}
+			broadcastChatMessage(player, noColorText);
+			event.setCancelled(true);
 		}
 	}
 
@@ -535,6 +564,8 @@ class DiscordConnectRuntime extends Plugin {
 	private void broadcastChatMessage(Player eventPlayer, String noColorText) {
 		Player[] players = Server.getAllPlayers();
 		for (Player player : players) {
+			if (!de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(player,
+					de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) continue;
 			String color = s.colorLocalOther;
 			if (player.getUID() == eventPlayer.getUID()) {
 				color = s.colorLocalSelf;
@@ -973,14 +1004,20 @@ class DiscordConnectRuntime extends Plugin {
 
 	public boolean dispatchDiscordChat(DiscordChatMessage message) {
 		return dispatchServer(() -> {
+			if (!s.botEnable || discordClient == null || !discordClient.isReady()) return;
 			if (!message.channelName().equalsIgnoreCase(s.botChatChannelName)
 					&& message.channelId() != s.chatChannelId) {
 				return;
 			}
 			String color = message.admin() && s.showGroup ? s.colorLocalAdmin : s.colorLocalDiscord;
 			String group = message.admin() && s.showGroup ? " (discord/admin)" : "";
-			Server.broadcastTextMessage(color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", "discord")
-					+ message.displayName() + group + ": " + c.endTag + message.content());
+			for (Player player : Server.getAllPlayers()) {
+				if (de.omegazirkel.risingworld.tools.ExternalDataConsent.isGranted(player,
+						de.omegazirkel.risingworld.tools.ExternalDataConsent.Purpose.DISCORD)) {
+					player.sendTextMessage(color + s.defaultChatPrefix.replace("**PH_LANGUAGE**", "discord")
+							+ message.displayName() + group + ": " + c.endTag + message.content());
+				}
+			}
 		});
 	}
 

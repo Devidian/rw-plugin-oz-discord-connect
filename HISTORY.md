@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep Discord community chat coherent: require player consent while the bot is connected, filter incoming chat and admin messages per recipient, use a DBID in the Discord online listing without consent, and fall back to local chat for everyone when the bot is unavailable.
+
 ## [0.25.2] - 2026-10-15 | Discord event threads
 
 - feat: Add persistent, channel-scoped public thread routing for plugin events and optional webhook delivery by thread ID.

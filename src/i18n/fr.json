@@ -433,6 +433,7 @@
       }
     },
     "support": {
+      "consent": {"required": "Pour utiliser le support Discord, autorisez d'abord le traitement externe Discord dans /ozt config."},
       "notavailable": "Le support Discord n\u0027est pas disponible !",
       "success": "Votre ticket de support a été envoyé à Discord !"
     },

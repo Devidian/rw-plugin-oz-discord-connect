@@ -433,6 +433,7 @@
       }
     },
     "support": {
+      "consent": {"required": "Dlya podderzhki Discord snachala razreshite peredachu dannykh v /ozt config."},
       "notavailable": "Поддержка Discord недоступна!",
       "success": "Ваш запрос в поддержку был отправлен в Discord!"
     },
