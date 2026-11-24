@@ -1,5 +1,8 @@
 # PLANS.md
 
+- [x] Route connected Discord chat only among consenting players and provide one local fallback when the bot is unavailable.
+- [ ] Verify both connected and disconnected chat modes on Development with two players.
+
 Planning is stored in repository-local docs.
 
 Restart ownership moved to Admin Utils; this plugin retains `/restart` and `/dc restart` as optional forwarding commands.
