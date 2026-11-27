@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-- Prevent a failed webhook image submission from blocking subsequent Discord delivery, and interrupt pending webhook waits during shutdown.
+## [0.26.1] - 2026-11-27 | Webhook delivery recovery
+
+- A failed screenshot submission releases the delivery queue so the next Discord message can proceed. Plugin shutdown interrupts pending webhook waits during reload.
+
+## [0.26.0] - 2026-11-18
+
 - Keep Discord community chat coherent: require player consent while the bot is connected, filter incoming chat and admin messages per recipient, use a DBID in the Discord online listing without consent, and fall back to local chat for everyone when the bot is unavailable.
 
 ## [0.25.2] - 2026-10-15 | Discord event threads
