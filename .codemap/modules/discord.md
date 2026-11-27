@@ -12,5 +12,6 @@ Discord connection, commands, forwarding and public integration surface. JDA tra
 - [`DiscordCommandService`](../../src/de/omegazirkel/risingworld/discordconnect/DiscordCommandService.java)
 - [`DiscordThreadRegistry`](../../src/de/omegazirkel/risingworld/discordconnect/DiscordThreadRegistry.java)
 - [`DiscordBoundaryTest`](../../src-test/de/omegazirkel/risingworld/discordconnect/DiscordBoundaryTest.java)
+- [`DiscordWebhookTransportTest`](../../src-test/de/omegazirkel/risingworld/DiscordWebhookTransportTest.java) covers failed image submission and worker shutdown.
 
 See the [repository index](../README.md) for lifecycle, build and cross-repository dependencies.

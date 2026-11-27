@@ -41,6 +41,8 @@ Discord Connect stores thread IDs in `discord-threads.json` beside its world set
 
 The optional webhook overload `sendDiscordMessageToWebHook(username, text, webhookUrl, image, parentChannelId, topic)` resolves the same thread and appends `thread_id` to the webhook request while preserving the webhook identity and image handling. The bot is required for topic resolution even when the message is delivered through a webhook. Existing chat, support, and status routes keep their direct channel behavior.
 
+Webhook requests run on a bounded transport worker. Image submission errors are logged and allow later queued deliveries to proceed. Pending webhook waits are interrupted when the plugin shuts down.
+
 For a shared thread, set GPS `discordStaticGPSChannelId` and Rewards `discordRewardsChannelId` to the same text channel ID, then set `discordStaticGPSThreadTopic` and `discordRewardsThreadTopic` to the same name, for example `World events`. Set the channel IDs to `0` to disable those routes.
 
 ## Commands ingame

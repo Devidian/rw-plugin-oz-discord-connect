@@ -2,6 +2,8 @@
 
 - [x] Route connected Discord chat only among consenting players and provide one local fallback when the bot is unavailable.
 - [ ] Verify both connected and disconnected chat modes on Development with two players.
+- [x] Keep webhook transport moving after image submission failures and make pending waits interruptible during shutdown.
+- [ ] Verify webhook image failure recovery and plugin shutdown on Development.
 
 Planning is stored in repository-local docs.
 

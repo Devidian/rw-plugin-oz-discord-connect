@@ -851,20 +851,19 @@ class DiscordConnectRuntime extends Plugin {
 						}
 					});
 
-					// Warten oder später weiterverwenden
-					imageFuture.join();
-
 				} catch (Exception ex) {
 					logger().error("Error building multipart request: " + ex.getMessage());
-					ex.printStackTrace();
+					imageFuture.completeExceptionally(ex);
 				}
 			} else {
 				imageFuture.complete(null);
 			}
 
 			// ---------- optional wait ----------
-			CompletableFuture.allOf(textFuture, imageFuture).join();
+			CompletableFuture.allOf(textFuture, imageFuture).get();
 
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
 		} catch (Exception ex) {
 			logger().error("Discord webhook request failed: " + ex.getMessage());
 			ex.printStackTrace();
